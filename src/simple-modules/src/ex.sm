@@ -1,0 +1,8 @@
+module m1
+  interface
+    [u : int
+     v : int]
+  body
+    [u = 33
+     v = 44]
+from m1 take u

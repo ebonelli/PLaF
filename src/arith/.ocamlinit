@@ -1,0 +1,12 @@
+open Arith.Interp;;
+open Arith.Ast;;
+open Arith.Ds;;
+(* Added by OPAM. *)
+let () =
+  try Topdirs.dir_directory (Sys.getenv "OCAML_TOPLEVEL_PATH")
+  with Not_found -> ()
+;;
+let () = Toploop.add_directive "reload"
+    (Directive_none (fun () -> Unix.execvp "dune" [|"dune";"utop";"src"|]))
+    { section="My Directives"
+    ; doc="Quit and reload utop"};;

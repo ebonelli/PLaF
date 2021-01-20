@@ -1,0 +1,10 @@
+
+
+
+(test
+(name test)
+(libraries ounit explicit_refs))
+
+(env
+  (dev
+(flags (:standard -warn-error -A))))

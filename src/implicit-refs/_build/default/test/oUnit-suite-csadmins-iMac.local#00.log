@@ -1,0 +1,114 @@
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Runner: processes
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Chooser: simple
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration suite_name = "suite"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration cache_filename = "/Users/ebonelli/Documents/repositories/github/PLaF/src/implicit-refs/_build/default/test/oUnit-$(suite_name).cache"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration run_gc_full_major = "true"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration display = "true"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration results_style_1_X = "false"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration testdata_dir = "none"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration health_check_interval = "1."
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration verbose = "false"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration chooser = "simple"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration output_html_dir = "none"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration processes_kill_period = "5."
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration runner = "processes"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration shards = "2"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration processes_grace_period = "5."
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration log_encoding = "utf-8"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration output_junit_file = "none"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration ci = "false"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Configuration output_file = "/Users/ebonelli/Documents/repositories/github/PLaF/src/implicit-refs/_build/default/test/oUnit-$(suite_name)-$(shard_id).log"
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Using 2 workers maximum.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Starting worker number csadmins-iMac.local#01.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Worker csadmins-iMac.local#01 started.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Starting worker number csadmins-iMac.local#02.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Worker csadmins-iMac.local#02 started.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:1:add, suite:0:int.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Start test suite:0:int.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:1:add, suite:0:int.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Start test suite:1:add.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:1:add, suite:0:int.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Test suite:0:int is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:1:add, suite:0:int.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: End test suite:0:int.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:1:add, suite:0:int.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:2:adds, suite:1:add.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Start test suite:2:adds.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:2:adds, suite:1:add.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Test suite:1:add is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:2:adds, suite:1:add.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: End test suite:1:add.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:2:adds, suite:1:add.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:3:let, suite:2:adds.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Start test suite:3:let.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:3:let, suite:2:adds.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Test suite:2:adds is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:3:let, suite:2:adds.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: End test suite:2:adds.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:3:let, suite:2:adds.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:4:lets, suite:3:let.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Test suite:3:let is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:4:lets, suite:3:let.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: End test suite:3:let.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Start test suite:4:lets.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:4:lets, suite:3:let.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:5:proc, suite:4:lets.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Start test suite:5:proc.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:5:proc, suite:4:lets.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Test suite:4:lets is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:5:proc, suite:4:lets.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: End test suite:4:lets.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:5:proc, suite:4:lets.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:6:letrec, suite:5:proc.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Test suite:5:proc is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:6:letrec, suite:5:proc.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: End test suite:5:proc.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Start test suite:6:letrec.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:6:letrec, suite:5:proc.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:7:hidden state, suite:6:letrec.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Start test suite:7:hidden state.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:7:hidden state, suite:6:letrec.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Test suite:6:letrec is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:7:hidden state, suite:6:letrec.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: End test suite:6:letrec.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Test suite:7:hidden state is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:7:hidden state, suite:6:letrec.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: End test suite:7:hidden state.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Still 2 tests running : suite:8:irefs2, suite:7:hidden state.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 2 tests running: suite:8:irefs2, suite:7:hidden state.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Start test suite:8:irefs2.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Still 1 tests running : suite:8:irefs2.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 1 tests running: suite:8:irefs2.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: Test suite:8:irefs2 is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Still 1 tests running : suite:8:irefs2.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 1 tests running: suite:8:irefs2.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#01 I: End test suite:8:irefs2.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Still 1 tests running : suite:8:irefs2.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 1 tests running: suite:8:irefs2.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: 0 tests running: .
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Worker csadmins-iMac.local#02 has ended.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Worker csadmins-iMac.local#01 has ended.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Used 2 worker during test execution.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Run 5 tests with shard csadmins-iMac.local#01.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Run 4 tests with shard csadmins-iMac.local#02.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Check health of shard csadmins-iMac.local#01, 1 times.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Check health of shard csadmins-iMac.local#02, 4 times.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: ==============
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Summary:
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:8:irefs2 is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:7:hidden state is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:6:letrec is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:5:proc is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:4:lets is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:3:let is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:2:adds is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:1:add is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Test suite:0:int is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Ran: 9 tests in: 0.11 seconds.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Cases: 9.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Tried: 9.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Errors: 0.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Failures: 0.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Skip: 0.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Todo: 0.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#00 I: Timeout: 0.

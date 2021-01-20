@@ -1,0 +1,18 @@
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Start test suite:0:int.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Test suite:0:int is successful.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: End test suite:0:int.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Start test suite:2:adds.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Test suite:2:adds is successful.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: End test suite:2:adds.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Start test suite:4:lets.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Test suite:4:lets is successful.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: End test suite:4:lets.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Start test suite:6:int.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Test suite:6:int is successful.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: End test suite:6:int.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Start test suite:9:ref3.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Test suite:9:ref3 is successful.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: End test suite:9:ref3.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Start test suite:10:ref4.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: Test suite:10:ref4 is successful.
+2021-01-20T21:22:19+00:00 csadmins-iMac.local#01 I: End test suite:10:ref4.

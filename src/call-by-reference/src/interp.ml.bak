@@ -1,0 +1,177 @@
+open ResultM
+open Ast
+open Ds
+
+let from_some = function
+  | None -> failwith "from_some: None"
+  | Some v -> v
+    
+let g_store = Store.empty_store 20 (NumVal 0)
+
+let init_env =
+  ExtendEnv("i", RefVal (Store.new_ref g_store (NumVal 1)),
+   ExtendEnv("v",RefVal (Store.new_ref g_store (NumVal 5)),
+    ExtendEnv("x",RefVal (Store.new_ref g_store (NumVal 10)),
+      EmptyEnv)))
+    
+
+let rec  apply_proc f refv =
+  match f with
+  | ProcVal (x,b,env) ->
+     eval_expr (extend_env env x refv) b
+  | _ -> error "apply_proc: Not a procVal"
+and
+  value_of_operand env e =
+  match e with
+  | Var id -> apply_env g_store env id
+  | _ -> eval_expr env e >>= fun ev ->
+         return @@ RefVal (Store.new_ref g_store ev)
+and
+  eval_expr (en:env) (e:expr) :(exp_val,string) result =
+  match e with
+  | Int n          -> return @@ NumVal n
+  | Var id          ->
+    apply_env g_store en id >>=
+    int_of_refVal >>=
+    Store.deref g_store >>=
+    fun ev -> (match ev with
+           | ThunkVal(e,en) -> eval_expr en e
+           | ev -> return ev )
+  | Unit -> return UnitVal              
+  | Add(e1,e2) ->
+    eval_expr en e1 >>=
+    num_of_numVal >>=
+    fun n1 -> eval_expr en e2 >>=
+    num_of_numVal >>=
+    fun n2 -> return @@ NumVal (n1+n2)
+  | Sub(e1,e2) ->
+    eval_expr en e1 >>=
+    num_of_numVal >>=
+    fun n1 -> eval_expr en e2 >>=
+    num_of_numVal >>=
+    fun n2 -> return @@ NumVal (n1-n2)
+  | Mul(e1,e2) ->
+    eval_expr en e1 >>=
+    num_of_numVal >>=
+    fun n1 -> eval_expr en e2 >>=
+    num_of_numVal >>=
+    fun n2 -> return @@ NumVal (n1*n2)
+  | Div(e1,e2) ->
+    eval_expr en e1 >>=
+    num_of_numVal >>=
+    fun n1 -> eval_expr en e2 >>=
+    num_of_numVal >>=
+    fun n2 -> return @@ NumVal (n1/n2)
+  | Let(v,def,body) ->
+    eval_expr en def >>=
+    fun v1 -> let l = Store.new_ref g_store v1 
+    in eval_expr (extend_env en v (RefVal l)) body
+  | ITE(e1,e2,e3) ->
+    eval_expr en e1 >>=
+    bool_of_boolVal >>=
+    fun b -> if b 
+               then eval_expr en e2
+               else eval_expr en e3
+  | IsZero(e) ->
+    eval_expr en e >>=
+    num_of_numVal >>=
+    fun n -> return @@ BoolVal (n = 0)
+  | Pair(e1,e2) ->
+    eval_expr en e1 >>=
+    fun ev1 -> eval_expr en e2 >>=
+    fun ev2 -> return @@ PairVal(ev1,ev2)
+  | Fst(e) ->
+    eval_expr en e >>=
+    pair_of_pairVal >>=
+    fun p -> return @@ fst p 
+  | Snd(e) ->
+    eval_expr en e >>=
+    pair_of_pairVal >>=
+    fun p -> return @@ snd p
+  | Proc(id,e)      -> return @@ ProcVal(id,e,en)
+  | App(e1,e2)     -> 
+    eval_expr en e1 >>=
+    fun v1 -> value_of_operand  en e2 >>=
+    fun v2 -> apply_proc v1 v2 
+  | Tuple(es) ->
+    mapM (eval_expr en) es >>=
+    fun evs -> return @@ TupleVal evs
+  | Letrec(id,param,body,e) ->
+    eval_expr (ExtendEnvRec(id,param,body,en)) e
+  | Set(id,e) ->
+    eval_expr en e >>=
+    fun v -> apply_env g_store en id >>=
+    int_of_refVal >>=
+    fun l -> Store.set_ref g_store l v >>=
+    fun _ -> return  UnitVal
+  | BeginEnd(es) ->
+    List.fold_left (fun v e -> eval_expr en e) (return UnitVal) es
+  | Debug ->
+    print_string "Environment:\n";
+    print_endline @@ string_of_env en;
+    print_string "\nStore:\n";
+    List.iteri (fun i s -> print_string (string_of_int i^"->"
+                                         ^s^"\n")) @@ List.map
+      string_of_expval @@ Store.store_to_list g_store;
+    return UnitVal
+  | _ -> failwith("Not implemented: "^string_of_expr e)
+and
+  eval_prog (Ast.AProg e) = eval_expr init_env e
+
+
+
+(***********************************************************************)
+(* Everything above this is essentially the same as we saw in lecture. *)
+(***********************************************************************)
+
+(* Parse a string into an ast *)
+
+
+let parse s =
+  let lexbuf = Lexing.from_string s in
+  let ast = Parser.prog Lexer.read lexbuf in
+  ast
+
+
+(* Interpret an expression *)
+let interp (e:string) : (exp_val,string) result =
+  e |> parse |> eval_prog 
+
+let ex1 = "
+let x = 7  
+in let y = 2 
+   in let y = let x = x-1 
+              in x-y 
+      in (x-8)- y"
+
+
+let ex2 = "
+   let g = 
+      let counter = 0 
+      in proc(d) {
+         begin 
+           set counter = counter+1; 
+           counter
+         end
+         }
+   in (g 11)-(g 22)"
+
+let ex3 = "
+let x = 0
+in letrec even(dummy) 
+            = if zero?(x)
+              then 1 
+              else begin 
+                    set x = x-1; 
+                    (odd 888) 
+                   end 
+          odd(dummy) 
+            = if zero?(x)
+              then 0 
+              else begin 
+                    set x = x-1;
+                    (even 888) 
+                   end 
+   in begin set x = 13; 
+            (odd -888) 
+      end "

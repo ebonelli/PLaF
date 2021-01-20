@@ -1,0 +1,25 @@
+
+
+
+(library
+ (name    proc)      ; name of the opam library
+ (public_name proc)  ; required for generating documentation
+                    ; also requires let.opam in root of workspace
+ (synopsis "Interpreter for PROC")
+ ;; (wrapped      false) ; true by default
+)
+
+; the next line avoids warnings from stopping the build
+(env
+  (dev
+   (flags (:standard -warn-error -A))))
+
+(ocamllex lexer)
+
+(menhir
+  (modules parser))
+
+;; Note
+;; Modules Ds,Ast,Interp,Lexer and Parser are placed as submodules inside a
+;; wrapper module Let. Let__Ds is declared an alias to Let.Ds (and similar with
+;; the others).

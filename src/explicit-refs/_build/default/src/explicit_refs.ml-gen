@@ -1,0 +1,17 @@
+(** @canonical Explicit_refs.Ast *)
+module Ast = Explicit_refs__Ast
+
+(** @canonical Explicit_refs.Ds *)
+module Ds = Explicit_refs__Ds
+
+(** @canonical Explicit_refs.Interp *)
+module Interp = Explicit_refs__Interp
+
+(** @canonical Explicit_refs.Lexer *)
+module Lexer = Explicit_refs__Lexer
+
+(** @canonical Explicit_refs.Parser *)
+module Parser = Explicit_refs__Parser
+
+(** @canonical Explicit_refs.Store *)
+module Store = Explicit_refs__Store

@@ -1,0 +1,12 @@
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Start test suite:1:add.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Test suite:1:add is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: End test suite:1:add.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Start test suite:3:let.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Test suite:3:let is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: End test suite:3:let.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Start test suite:5:proc.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Test suite:5:proc is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: End test suite:5:proc.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Start test suite:7:hidden state.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: Test suite:7:hidden state is successful.
+2021-01-20T21:09:33+00:00 csadmins-iMac.local#02 I: End test suite:7:hidden state.

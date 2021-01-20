@@ -1,0 +1,3 @@
+(lang dune 2.1)
+(name implicit_refs)
+(using menhir 2.0)
