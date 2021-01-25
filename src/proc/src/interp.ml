@@ -9,7 +9,7 @@ let rec apply_proc : exp_val -> exp_val -> exp_val ea_result =
     return env >>+
     extend_env id a >>+
     eval_expr body
-  | _ -> error "apply_proc: Not a procVal"
+  | _ -> error "apply_proc: Not a closure"
 and
   eval_expr : expr -> exp_val ea_result =
   fun e ->
