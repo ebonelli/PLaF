@@ -80,6 +80,22 @@ from m take u"));
 from m take u"));
 
 
+    "id out of scope"    >:: (fun _ -> assert_equal (Error "Key not found")
+                                (interp "
+module m2
+interface [v : int] 
+body
+[v = (from m1 take u) - 11]
+module m1 interface [u : int] body [u = 44]
+(from m1 take u) - (from m2 take v)"));
+
+    "id in scope"    >:: (fun _ -> assert_equal (Ok (NumVal 11))
+                                (interp "module m1 interface [u : int] body [u = 44]
+         module m2   
+          interface [v : int] 
+          body [v = (from m1 take u)-11]
+         (from m1 take u)-(from m2 take v)"));
+  
   
   "typecheck body inclusion 5"
   >:: (fun _ -> assert_equal (Ok (NumVal 33))
