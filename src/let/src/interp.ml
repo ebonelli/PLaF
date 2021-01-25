@@ -65,8 +65,9 @@ let parse (s:string) : expr =
 
 
 (** [interp s] parses [s] and then evaluates it *)
-let interp (e:string) : int result =
-  e |> parse |> eval_expr
+let interp (e:string) : exp_val result =
+  let c = e |> parse |> eval_expr
+  in run c
   
 
 
