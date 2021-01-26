@@ -114,13 +114,13 @@ and
    * return renv *)
   eval_module_definition : module_body -> env ea_result = fun (AModBody vdefs) ->
   lookup_env >>= fun glo_env ->
-  (List.fold_left (fun loc_env (var,decl)  ->
+  List.fold_left (fun loc_env (var,decl)  ->
        loc_env >>+
        (append_env_rev glo_env >>+
         eval_expr decl >>=
         extend_env var))
       (empty_env ())
-      vdefs)
+      vdefs
 and
   eval_module_definitions : module_decl list -> env ea_result = fun ms ->
   List.fold_left
