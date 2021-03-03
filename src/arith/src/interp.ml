@@ -5,7 +5,7 @@ open Ds
 let rec eval_expr : expr -> int result =
   fun e ->
   match e with
-  | Int n      -> Ok n
+  | Int n      -> return n
   | Add(e1,e2) ->
     eval_expr e1 >>= fun n ->
     eval_expr e2 >>= fun m ->
