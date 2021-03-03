@@ -7,31 +7,23 @@ let rec eval_expr : expr -> int result =
   match e with
   | Int n      -> Ok n
   | Add(e1,e2) ->
-    (match eval_expr e1 with
-     | Error s -> Error s
-     | Ok m -> (match eval_expr e2 with
-                | Error s -> Error s
-                | Ok n -> Ok (m+n)))
+    eval_expr e1 >>= fun n ->
+    eval_expr e2 >>= fun m ->
+    return (n+m)   
   | Sub(e1,e2) ->
-    (match eval_expr e1 with
-     | Error s -> Error s
-     | Ok m -> (match eval_expr e2 with
-                | Error s -> Error s
-                | Ok n -> Ok (m-n)))
+    eval_expr e1 >>= fun n ->
+    eval_expr e2 >>= fun m ->
+    return (n-m)   
   | Mul(e1,e2) ->
-    (match eval_expr e1 with
-     | Error s -> Error s
-     | Ok m -> (match eval_expr e2 with
-                | Error s -> Error s
-                | Ok n -> Ok (m*n)))
+    eval_expr e1 >>= fun n ->
+    eval_expr e2 >>= fun m ->
+    return (n*m)   
   | Div(e1,e2) ->
-    (match eval_expr e1 with
-     | Error s -> Error s
-     | Ok m -> (match eval_expr e2 with
-                | Error s -> Error s
-                | Ok n -> if n==0 
-                          then Error "Division by zero" 
-                          else Ok (m/n)))
+    eval_expr e1 >>= fun n ->
+    eval_expr e2 >>= fun m ->
+    if m=0
+    then error "Division by zero"
+    else return (n/m)
   | _ -> Error "Not implemented yet!"
 
 
@@ -45,6 +37,6 @@ let parse (s:string) : expr =
 (** [interp s] parses [s] and then evaluates it *)
 let interp (e:string) : int result =
   e |> parse |> eval_expr
-  
+
 
 
