@@ -50,6 +50,7 @@ open Ast
 %token FST
 %token SND
 %token NOT
+%token MAX
 %token DEBUG
 %token EOF
 
@@ -65,7 +66,7 @@ open Ast
    parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
 
 %nonassoc IN ELSE EQUALS            /* lowest precedence */
-%left PLUS MINUS
+%left PLUS MINUS 
 %left TIMES DIVIDED    /* highest precedence */
                           (*%nonassoc UMINUS        /* highest precedence */*)
 
@@ -148,6 +149,7 @@ expr:
     | FST; LPAREN; e=expr; RPAREN { Fst(e) }
     | SND; LPAREN; e=expr; RPAREN { Snd(e) }
     | NOT; LPAREN; e=expr; RPAREN { Not(e) }
+    | MAX; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Max(e1,e2) }
     | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
     | LETREC; x = ID; LPAREN; y = ID; RPAREN; EQUALS; e1 = expr; IN; e2 = expr { Letrec(x,y,e1,e2) }
     | PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,e) }

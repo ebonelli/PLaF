@@ -70,6 +70,7 @@ rule read =
   | "fst"    { FST }
   | "snd"    { SND }
   | "not"    { NOT }
+  | "max"    { MAX }
   | "(*"     { comment lexbuf } (* activate "comment" rule *)
   | id       { ID (Lexing.lexeme lexbuf) }
   | int      { INT (int_of_string (Lexing.lexeme lexbuf)) }

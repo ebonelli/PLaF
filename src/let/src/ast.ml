@@ -22,6 +22,7 @@ type expr =
   | Pair of expr*expr
   | Fst of expr
   | Snd of expr
+  | Max of expr*expr
   | Not of expr
 
 let rec string_of_expr e =
@@ -49,4 +50,5 @@ let rec string_of_expr e =
   | Fst(e) -> "Fst("^string_of_expr e^")"
   | Snd(e) -> "Snd("^string_of_expr e^")"
   | Not(e) -> "Not("^string_of_expr e^")"
+  | Max(e1,e2) -> "Max("^string_of_expr e1^","^string_of_expr e2^")"
 
