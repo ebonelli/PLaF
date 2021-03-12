@@ -3,7 +3,7 @@
 
 (test
 (name test)
-(libraries ounit arith))
+(libraries ounit2 arith))
 
 (env
   (dev

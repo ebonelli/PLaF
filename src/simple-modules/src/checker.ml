@@ -45,7 +45,7 @@ and
 and
   type_of_expr : expr -> texpr tea_result = fun e ->
   match e with
-  | Int n          ->
+  | Int _n          ->
     return IntType
   | Var id          ->
     apply_tenv id 
@@ -92,7 +92,7 @@ and
      if t=tRes 
      then type_of_expr  e
      else error "LetRec: Types of recursive function does not match declaration")
-  | Set(id,e) ->
+  | Set(_id,_e) ->
       error "EXPLICIT-REFS: Set not a valid operation"
   | BeginEnd(es) ->
     List.fold_left (fun _ e -> type_of_expr e) (return UnitType) es
@@ -113,7 +113,7 @@ and
     lookup_module_type module_id >>= fun tenv ->
     append_tenv tenv >>+
     type_of_expr e
-  | Debug(e) ->
+  | Debug(_e) ->
     string_of_tenv >>= fun str ->
     print_endline str;
     return UnitType

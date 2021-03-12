@@ -5,11 +5,11 @@ type 'a result = Ok of 'a | Error of string
 type ('a,'b) a_result = 'b -> 'a result
   
 let return (v:'a) : ('a,'b) a_result =
-  fun env ->
+  fun _env ->
   Ok v
 
 let error (s:string) : ('a,'b) a_result =
-  fun env ->
+  fun _env ->
   Error s
 
 let (>>=) (c:('a,'c) a_result) (f: 'a -> ('b,'c) a_result) : ('b,'c) a_result =

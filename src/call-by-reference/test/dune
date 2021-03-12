@@ -3,7 +3,7 @@
 
 (test
 (name test)
-(libraries ounit cbref))
+(libraries ounit2 cbref))
 
 (env
   (dev

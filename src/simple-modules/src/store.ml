@@ -1,12 +1,9 @@
 open ReM
-open Ds
 
 type 'a t = { mutable data: 'a array; mutable size: int}
   (* data is declared mutable so the store may be resized *)
 
 let empty_store i v = { data=Array.make i v; size=0 }
-
-let get_size st = st.size
 
 let enlarge_store st value =
   let new_array = Array.make (st.size*2) value
@@ -39,8 +36,8 @@ let set_ref st ref value =
     
 let rec take n = function
   | [] -> []
-  |  x::xs when n>0 -> x::take (n-1) xs
-  | x::xs -> []
+  | x::xs when n>0 -> x::take (n-1) xs
+  | _ -> []
 
 let string_of_store' f st =
   let ss = List.mapi (fun i x -> (i,f x)) @@ take st.size @@ Array.to_list @@ st.data

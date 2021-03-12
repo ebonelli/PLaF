@@ -3,7 +3,7 @@
 
 (test
 (name test)
-(libraries ounit sm))
+(libraries ounit2 sm))
 
 (env
   (dev

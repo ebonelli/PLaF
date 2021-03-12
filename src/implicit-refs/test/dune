@@ -3,7 +3,7 @@
 
 (test
 (name test)
-(libraries ounit implicit_refs))
+(libraries ounit2 implicit_refs))
 
 (env
   (dev
