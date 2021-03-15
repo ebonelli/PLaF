@@ -49,6 +49,7 @@ open Ast
 %token PAIR
 %token FST
 %token SND
+%token UNPAIR
 %token NOT
 %token MAX
 %token DEBUG
@@ -148,6 +149,7 @@ expr:
     | PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
     | FST; LPAREN; e=expr; RPAREN { Fst(e) }
     | SND; LPAREN; e=expr; RPAREN { Snd(e) }
+    | UNPAIR; LPAREN; x = ID; COMMA; y=ID; RPAREN; EQUALS; e1 = expr; IN; e2 = expr { Unpair(x,y,e1,e2) }
     | NOT; LPAREN; e=expr; RPAREN { Not(e) }
     | MAX; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Max(e1,e2) }
     | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }

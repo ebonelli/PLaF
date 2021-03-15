@@ -22,6 +22,7 @@ type expr =
   | Pair of expr*expr
   | Fst of expr
   | Snd of expr
+  | Unpair of string*string*expr*expr
   | Max of expr*expr
   | Not of expr
 
@@ -51,4 +52,6 @@ let rec string_of_expr e =
   | Snd(e) -> "Snd("^string_of_expr e^")"
   | Not(e) -> "Not("^string_of_expr e^")"
   | Max(e1,e2) -> "Max("^string_of_expr e1^","^string_of_expr e2^")"
+  | Unpair(id1,id2,e1,e2) -> "unpair("^id1^","^id2^")="^string_of_expr
+  e1^" in "^string_of_expr e2
 

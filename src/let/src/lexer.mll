@@ -69,6 +69,7 @@ rule read =
   | "pair"   { PAIR }
   | "fst"    { FST }
   | "snd"    { SND }
+  | "unpair"    { UNPAIR }
   | "not"    { NOT }
   | "max"    { MAX }
   | "(*"     { comment lexbuf } (* activate "comment" rule *)
