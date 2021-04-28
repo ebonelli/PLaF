@@ -81,7 +81,7 @@ and
     string_of_env >>= fun str ->
     print_endline str; 
     error "Debug called"
-  | _ -> error "Not implemented yet!"
+  | _ -> failwith "Not implemented yet!"
 
 
 

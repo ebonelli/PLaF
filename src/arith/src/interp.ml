@@ -24,7 +24,7 @@ let rec eval_expr : expr -> int result =
     if m=0
     then error "Division by zero"
     else return (n/m)
-  | _ -> Error "Not implemented yet!"
+  | _ -> failwith "Not implemented yet!"
 
 
 (** [parse s] parses string [s] into an ast *)

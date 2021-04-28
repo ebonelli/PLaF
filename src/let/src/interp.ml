@@ -53,7 +53,7 @@ let rec eval_expr : expr -> exp_val ea_result =
     string_of_env >>= fun str ->
     print_endline str; 
     error "Debug called"
-  | _ -> error "Not implemented yet!"
+  | _ -> failwith "Not implemented yet!"
 
 
 

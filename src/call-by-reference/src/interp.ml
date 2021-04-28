@@ -105,7 +105,7 @@ and
     let str_store = Store.string_of_store string_of_expval g_store 
     in (print_endline (str_env^"\n"^str_store);
     error "Reached breakpoint")
-  | _ -> error ("Not implemented: "^string_of_expr e)
+  | _ -> failwith ("Not implemented: "^string_of_expr e)
 
 
 
