@@ -52,6 +52,7 @@ rule read =
   | "."      { DOT }
   | "let"    { LET }
   | "="      { EQUALS }
+  | "<="     { EQUALSMUTABLE }
   | "in"     { IN }
   | "proc"   { PROC }
   | "zero?"  { ISZERO }

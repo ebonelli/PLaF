@@ -31,6 +31,7 @@ open Ast
 %token RBRACE
 %token LET
 %token EQUALS
+%token EQUALSMUTABLE
 %token IN
 %token PROC
 %token ISZERO
@@ -65,7 +66,7 @@ open Ast
    Because PLUS has higher precedence than IN, "let x=1 in x+2" will
    parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
 
-%nonassoc IN ELSE EQUALS            /* lowest precedence */
+%nonassoc IN ELSE EQUALS  EQUALSMUTABLE           /* lowest precedence */
 %left PLUS MINUS
 %left TIMES DIVIDED   
 %left DOT    /* highest precedence */
@@ -170,14 +171,12 @@ expr:
       IN; e2 = expr { Unpair(x,y,e1,e2) }
     | LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
     | e1=expr; DOT; id=ID { Proj(e1,id) }
+    | e1=expr; DOT; id=ID; EQUALSMUTABLE; e=expr { SetField(e1,id,e) }
     ;
 
 field:
-      id = ID; EQUALS; e=expr { (id,e) }
-
-    ;
-
-
+    | id = ID; EQUALS; e=expr { (id,(false,e)) }
+    | id = ID; EQUALSMUTABLE; e=expr { (id,(true,e)) }
     ;
 
 exprs:

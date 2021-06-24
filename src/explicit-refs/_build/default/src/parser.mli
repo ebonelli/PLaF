@@ -26,6 +26,7 @@ type token =
   | IF
   | ID of (string)
   | FST
+  | EQUALSMUTABLE
   | EQUALS
   | EOF
   | END

@@ -24,8 +24,9 @@ type expr =
   | Tuple of expr list
   | Pair of expr*expr
   | Unpair of string*string*expr*expr
-  | Record of (string*expr) list
+  | Record of (string*(bool*expr)) list
   | Proj of expr*string              
+  | SetField of expr*string*expr              
   | Debug of expr
 
 let rec string_of_expr e =
