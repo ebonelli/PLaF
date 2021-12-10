@@ -1,0 +1,10 @@
+
+
+
+(test
+(name test)
+(libraries ounit cbname_refs))
+
+(env
+  (dev
+(flags (:standard -warn-error -A))))
