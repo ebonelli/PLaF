@@ -48,8 +48,11 @@ rule read =
   | ")"      { RPAREN }
   | "{"      { LBRACE }
   | "}"      { RBRACE }
-  | ";"      { SEMICOLON }
+  | "<"      { LANGLE }
+  | ">"      { RANGLE }
+  | ";"      { SEMICOLON }      
   | ","      { COMMA }
+  | "."      { DOT }
   | "let"    { LET }
   | "="      { EQUALS }
   | "in"     { IN }
@@ -70,6 +73,7 @@ rule read =
   | "fst"    { FST }
   | "snd"    { SND }
   | "unpair"    { UNPAIR }
+  | "untuple" { UNTUPLE }
   | "not"    { NOT }
   | "max"    { MAX }
   | "(*"     { comment lexbuf } (* activate "comment" rule *)

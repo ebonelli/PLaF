@@ -29,6 +29,8 @@ open Ast
 %token RPAREN
 %token LBRACE
 %token RBRACE
+%token LANGLE
+%token RANGLE
 %token LET
 %token EQUALS
 %token IN
@@ -46,10 +48,12 @@ open Ast
 %token SETREF
 %token SEMICOLON
 %token COMMA
+%token DOT
 %token PAIR
 %token FST
 %token SND
 %token UNPAIR
+%token UNTUPLE
 %token NOT
 %token MAX
 %token DEBUG
@@ -68,8 +72,9 @@ open Ast
 
 %nonassoc IN ELSE EQUALS            /* lowest precedence */
 %left PLUS MINUS 
-%left TIMES DIVIDED    /* highest precedence */
-                          (*%nonassoc UMINUS        /* highest precedence */*)
+%left TIMES DIVIDED    
+%left DOT    /* highest precedence */
+    (*%nonassoc UMINUS        /* highest precedence */*)
 
 
 (* After declaring associativity and precedence, we need to declare what
@@ -166,9 +171,23 @@ expr:
     | LPAREN; e = expr; RPAREN {e}
       (*    | MINUS e = expr %prec UMINUS { SubExp(IntExp 0,e) }*)
     | LPAREN; MINUS e = expr; RPAREN  { Sub(Int 0, e) }
+    | LANGLE; es = exprs_comma; RANGLE { Tuple(es) }
+    | UNTUPLE; LANGLE; is = ids ;RANGLE; EQUALS; e1 = expr; IN;
+      e2 = expr { Untuple(is,e1,e2) }
+    | LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
+    | e1=expr; DOT; id=ID { Proj(e1,id) }
     ;
 
 exprs:
     es = separated_list(SEMICOLON, expr)    { es } ;
 
+exprs_comma:
+    es = separated_list(COMMA, expr)    { es } ;
+
+ids:
+  is = separated_list(COMMA, ID)    { is } ;
+
+field:
+      id = ID; EQUALS; e=expr { (id,e) }
+    ;
 (* And that's the end of the grammar definition. *)

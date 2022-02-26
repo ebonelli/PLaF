@@ -23,6 +23,10 @@ type expr =
   | Fst of expr
   | Snd of expr
   | Unpair of string*string*expr*expr
+  | Tuple of expr list
+  | Untuple of string list * expr*expr
+  | Record of (string*expr) list
+  | Proj of expr*string
   | Max of expr*expr
   | Not of expr
 
@@ -45,13 +49,18 @@ let rec string_of_expr e =
   | ITE(e1,e2,e3) -> "ITE("^string_of_expr e1^"," ^ string_of_expr e2^"," ^ string_of_expr e3  ^")"
   | Letrec(x,param,def,body) -> "Letrec("^x^","^ param ^","^ string_of_expr def ^","^ string_of_expr body ^")"
   | Set(x,rhs) -> "Set("^x^","^string_of_expr rhs^")"
-  | BeginEnd(es) -> "BeginEnd(" ^ List.fold_left (fun x y -> x^","^y)
-                      "" (List.map string_of_expr es) ^")"
+  | BeginEnd(es) -> "BeginEnd(" ^ String.concat "," (List.map string_of_expr es) ^")"
   | Pair(e1,e2) -> "Pair("^string_of_expr e1^","^string_of_expr e2^")"
   | Fst(e) -> "Fst("^string_of_expr e^")"
   | Snd(e) -> "Snd("^string_of_expr e^")"
   | Not(e) -> "Not("^string_of_expr e^")"
   | Max(e1,e2) -> "Max("^string_of_expr e1^","^string_of_expr e2^")"
   | Unpair(id1,id2,e1,e2) -> "unpair("^id1^","^id2^")="^string_of_expr
-  e1^" in "^string_of_expr e2
+                               e1^" in "^string_of_expr e2
+  | Tuple(es) -> "<" ^ String.concat "," (List.map string_of_expr es) ^">"
+  | Untuple(ids,e1,e2) -> "untuple <"^ String.concat "," ids ^ ">="^
+                          string_of_expr e1 ^" in "^string_of_expr e2
+  | Record(fs) -> "{"^String.concat "," (List.map (fun (id,e) ->
+  id^"="^string_of_expr e) fs) ^"}"
+  | Proj(e,id) -> string_of_expr e ^"."^id
 

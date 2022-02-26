@@ -48,8 +48,11 @@ rule read =
   | ")"      { RPAREN }
   | "{"      { LBRACE }
   | "}"      { RBRACE }
-  | ";"      { SEMICOLON }
+  | "<"      { LANGLE }
+  | ">"      { RANGLE }
+  | ";"      { SEMICOLON }      
   | ","      { COMMA }
+  | "."      { DOT }
   | "let"    { LET }
   | "="      { EQUALS }
   | "in"     { IN }
@@ -65,10 +68,14 @@ rule read =
   | "newref" { NEWREF }
   | "deref"  { DEREF }
   | "setref" { SETREF }
-  | "pair"     { PAIR }
-  | "fst"     { FST }
-  | "snd"     { SND }
   | "debug"      { DEBUG }
+  | "pair"   { PAIR }
+  | "fst"    { FST }
+  | "snd"    { SND }
+  | "unpair"    { UNPAIR }
+  | "untuple" { UNTUPLE }
+  | "not"    { NOT }
+  | "max"    { MAX }
   | "(*"     { comment lexbuf } (* activate "comment" rule *)
   | id       { ID (Lexing.lexeme lexbuf) }
   | int      { INT (int_of_string (Lexing.lexeme lexbuf)) }

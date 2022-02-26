@@ -29,6 +29,8 @@ open Ast
 %token RPAREN
 %token LBRACE
 %token RBRACE
+%token LANGLE
+%token RANGLE
 %token LET
 %token EQUALS
 %token IN
@@ -44,9 +46,17 @@ open Ast
 %token NEWREF
 %token DEREF
 %token SETREF
-%token DEBUG
 %token SEMICOLON
 %token COMMA
+%token DOT
+%token PAIR
+%token FST
+%token SND
+%token UNPAIR
+%token UNTUPLE
+%token NOT
+%token MAX
+%token DEBUG
 %token EOF
 
 (* After declaring the tokens, we have to provide some additional information
@@ -61,9 +71,10 @@ open Ast
    parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
 
 %nonassoc IN ELSE EQUALS            /* lowest precedence */
-%left PLUS MINUS
-%left TIMES DIVIDED    /* highest precedence */
-                          (*%nonassoc UMINUS        /* highest precedence */*)
+%left PLUS MINUS 
+%left TIMES DIVIDED    
+%left DOT    /* highest precedence */
+    (*%nonassoc UMINUS        /* highest precedence */*)
 
 
 (* After declaring associativity and precedence, we need to declare what
@@ -104,7 +115,7 @@ open Ast
    the resulting value to [e].  The action simply says to return that value [e]. *)
 
 prog:
-	| e = expr; EOF {  e }
+	| e = expr; EOF { e }
 	;
 
 (* The second rule, named [expr], has productions for integers, variables,
@@ -135,11 +146,17 @@ prog:
 expr:
     | i = INT { Int i }
     | x = ID { Var x }
+    | DEBUG;LPAREN; e=expr; RPAREN { Debug(e) }
     | e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
     | e1 = expr; MINUS; e2 = expr { Sub(e1,e2) }
     | e1 = expr; TIMES; e2 = expr { Mul(e1,e2) }
     | e1 = expr; DIVIDED; e2 = expr { Div(e1,e2) }
-    | DEBUG;LPAREN; e=expr; RPAREN { Debug(e) }
+    | PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
+    | FST; LPAREN; e=expr; RPAREN { Fst(e) }
+    | SND; LPAREN; e=expr; RPAREN { Snd(e) }
+    | UNPAIR; LPAREN; x = ID; COMMA; y=ID; RPAREN; EQUALS; e1 = expr; IN; e2 = expr { Unpair(x,y,e1,e2) }
+    | NOT; LPAREN; e=expr; RPAREN { Not(e) }
+    | MAX; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Max(e1,e2) }
     | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
     | LETREC; x = ID; LPAREN; y = ID; RPAREN; EQUALS; e1 = expr; IN; e2 = expr { Letrec(x,y,e1,e2) }
     | PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,e) }
@@ -154,9 +171,23 @@ expr:
     | LPAREN; e = expr; RPAREN {e}
       (*    | MINUS e = expr %prec UMINUS { SubExp(IntExp 0,e) }*)
     | LPAREN; MINUS e = expr; RPAREN  { Sub(Int 0, e) }
+    | LANGLE; es = exprs_comma; RANGLE { Tuple(es) }
+    | UNTUPLE; LANGLE; is = ids ;RANGLE; EQUALS; e1 = expr; IN;
+      e2 = expr { Untuple(is,e1,e2) }
+    | LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
+    | e1=expr; DOT; id=ID { Proj(e1,id) }
     ;
 
 exprs:
     es = separated_list(SEMICOLON, expr)    { es } ;
 
+exprs_comma:
+    es = separated_list(COMMA, expr)    { es } ;
+
+ids:
+  is = separated_list(COMMA, ID)    { is } ;
+
+field:
+      id = ID; EQUALS; e=expr { (id,e) }
+    ;
 (* And that's the end of the grammar definition. *)
