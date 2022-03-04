@@ -68,9 +68,9 @@ let rec apply_env : string -> exp_val ea_result =
     if id=v
     then Ok (ProcVal (par,body,env))
     else apply_env id tail                                              
-  | ExtendEnvMod(moduleName,bindings,tail) -> apply_env id tail
+  | ExtendEnvMod(_moduleName,_bindings,tail) -> apply_env id tail
 
-let rec lookup_env : env ea_result =
+let lookup_env : env ea_result =
   fun env ->
   Ok env
 
@@ -78,8 +78,8 @@ let rec apply_env_qual : string -> string -> exp_val ea_result = fun mid id ->
   fun env ->
   match env with
   | EmptyEnv -> Error "Key not found"
-  | ExtendEnv(key,value,env) -> apply_env_qual mid id env
-  | ExtendEnvRec(key,param,body,env) -> apply_env_qual mid id env
+  | ExtendEnv(_key,_value,env) -> apply_env_qual mid id env
+  | ExtendEnvRec(_key,_param,_body,env) -> apply_env_qual mid id env
   | ExtendEnvMod(moduleName,bindings,env) ->
     if mid=moduleName
     then apply_env id bindings
@@ -89,8 +89,8 @@ let rec lookup_module : string -> env ea_result = fun mid ->
   fun env ->
   match env with
   | EmptyEnv -> Error "module not found"
-  | ExtendEnv (key,value,env) -> lookup_module mid env 
-  | ExtendEnvRec(key,param,body,env) -> lookup_module mid env 
+  | ExtendEnv (_key,_value,env) -> lookup_module mid env 
+  | ExtendEnvRec(_key,_param,_body,env) -> lookup_module mid env 
   | ExtendEnvMod(moduleName,bindings,env) ->
     if mid=moduleName
     then Ok bindings
@@ -131,7 +131,12 @@ let tupleVal_to_list_of_evs: exp_val -> (exp_val list) ea_result = function
   | TupleVal(evs) -> return evs
   | _ -> error "Expected a tuple!"
 
-
+let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+  fun ev ->
+  match ev with
+  | ProcVal(id,body,en) -> return (id,body,en)
+  | _ -> error "Expected a closure!"
+           
 let rec string_of_list_of_strings = function
   | [] -> ""
   | [id] -> id

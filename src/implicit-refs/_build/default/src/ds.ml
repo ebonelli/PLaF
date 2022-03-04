@@ -102,7 +102,12 @@ let tupleVal_to_list_of_evs: exp_val -> (exp_val list) ea_result = function
   | TupleVal(evs) -> return evs
   | _ -> error "Expected a tuple!"
 
-
+let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+  fun ev ->
+  match ev with
+  | ProcVal(id,body,en) -> return (id,body,en)
+  | _ -> error "Expected a closure!"
+           
 let rec string_of_list_of_strings = function
   | [] -> ""
   | [id] -> id

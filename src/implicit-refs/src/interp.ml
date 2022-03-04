@@ -3,13 +3,12 @@ open Ds
     
 let g_store = Store.empty_store 20 (NumVal 0)
 
-let rec apply_proc ev1 ev2 =
-  match ev1 with
-  | ProcVal(par,body,en) ->
-    return en >>+
-    extend_env par (RefVal (Store.new_ref g_store ev2)) >>+
-    eval_expr body
-  | _ -> error "apply_proc: Not a procVal"
+
+let rec apply_clos : string*Ast.expr*env -> exp_val -> exp_val ea_result =
+  fun (id,e,en) ev ->
+  return en >>+
+  extend_env id (RefVal (Store.new_ref g_store ev)) >>+
+  eval_expr e
 and
   eval_expr : expr -> exp_val ea_result = fun e ->
   match e with
@@ -84,9 +83,10 @@ and
     lookup_env >>= fun en ->
     return (ProcVal(id,e,en))
   | App(e1,e2)  -> 
-    eval_expr e1 >>= fun v1 ->
-    eval_expr e2 >>= fun v2 ->
-    apply_proc v1 v2
+    eval_expr e1 >>= 
+    clos_of_procVal >>= fun clos ->
+    eval_expr e2 >>= 
+    apply_clos clos
   | Letrec(id,par,e,target) ->
     let l = Store.new_ref g_store UnitVal in
     extend_env id (RefVal l) >>+

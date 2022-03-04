@@ -3528,11 +3528,10 @@ and _menhir_discard : _menhir_env -> _menhir_env =
 
 and prog : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.expr) =
   fun lexer lexbuf ->
-    let _menhir_env = let _tok = Obj.magic () in
-    {
+    let _menhir_env = {
       _menhir_lexer = lexer;
       _menhir_lexbuf = lexbuf;
-      _menhir_token = _tok;
+      _menhir_token = Obj.magic ();
       _menhir_error = false;
     } in
     Obj.magic (let _menhir_stack = ((), _menhir_env._menhir_lexbuf.Lexing.lex_curr_p) in
@@ -3585,4 +3584,4 @@ and prog : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.expr) =
 # 269 "<standard.mly>"
   
 
-# 3589 "src/parser.ml"
+# 3588 "src/parser.ml"

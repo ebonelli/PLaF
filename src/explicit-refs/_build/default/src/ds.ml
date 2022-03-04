@@ -113,6 +113,12 @@ let fields_of_recordVal: exp_val -> ((string*exp_val) list) ea_result = function
   | RecordVal(fs) -> return fs
   | _ -> error "Expected a record!"
 
+let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+  fun ev ->
+  match ev with
+  | ProcVal(id,body,en) -> return (id,body,en)
+  | _ -> error "Expected a closure!"
+           
 let rec string_of_list_of_strings = function
   | [] -> ""
   | [id] -> id

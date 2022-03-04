@@ -79,6 +79,12 @@ let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result = function
   | PairVal(v1,v2) -> return (v1,v2)
   | _ -> error "Expected a pair!"
 
+let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+  fun ev ->
+  match ev with
+  | ProcVal(id,body,en) -> return (id,body,en)
+  | _ -> error "Expected a closure!"
+           
 let rec string_of_list_of_strings = function
   | [] -> ""
   | [id] -> id

@@ -2,14 +2,11 @@ open Ast
 open Ds
 
 
-let rec apply_proc : exp_val -> exp_val -> exp_val ea_result =
-  fun f a ->
-  match f with
-  | ProcVal (id,body,env) ->
-    return env >>+
-    extend_env id a >>+
-    eval_expr body
-  | _ -> error "apply_proc: Not a closure"
+let rec apply_clos : string*Ast.expr*env -> exp_val -> exp_val ea_result =
+  fun (id,e,en) ev ->
+  return en >>+
+  extend_env id ev >>+
+  eval_expr e
 and
   eval_expr : expr -> exp_val ea_result =
   fun e ->
@@ -74,9 +71,10 @@ and
     lookup_env >>= fun en ->
     return (ProcVal(id,e,en))
   | App(e1,e2)  -> 
-    eval_expr e1 >>= fun v1 ->
-    eval_expr e2 >>= fun v2 ->
-    apply_proc v1 v2 
+    eval_expr e1 >>= 
+    clos_of_procVal >>= fun clos ->
+    eval_expr e2 >>= 
+    apply_clos clos 
  | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
