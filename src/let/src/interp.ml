@@ -59,6 +59,14 @@ let rec eval_expr : expr -> exp_val ea_result =
     extend_env id1 ev1 >>+
     extend_env id2 ev2 >>+
     eval_expr e2
+  | Fst(e) ->
+    eval_expr e >>=
+    pair_of_pairVal >>= fun (ev1,_ev2) ->
+    return ev1
+  | Snd(e) -> 
+    eval_expr e >>=
+    pair_of_pairVal >>= fun (_ev1,ev2) ->
+    return ev2
   | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 

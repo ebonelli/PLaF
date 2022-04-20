@@ -1,3 +1,4 @@
+
 (* The first section of the lexer definition, called the *header*,
    is the part that appears below between { and }.  It is code
    that will simply be copied literally into the generated lexer.ml. *)
@@ -46,8 +47,6 @@ rule read =
   | ")"      { RPAREN }
   | "{"      { LBRACE }
   | "}"      { RBRACE }
-  | "<"      { LANGLE }
-  | ">"      { RANGLE }
   | ";"      { SEMICOLON }
   | ":"      { COLON }
   | ","      { COMMA }
