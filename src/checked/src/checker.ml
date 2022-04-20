@@ -38,17 +38,7 @@ let rec chk_expr : expr -> texpr tea_result = function
     chk_expr e2 >>= fun t3 ->
     if t1=t3
     then return t2
-    else error "app: type of argument incorrect"
-  | Pair(e1,e2) ->
-    chk_expr e1 >>= fun t1 ->
-    chk_expr e2 >>= fun t2 ->
-    return @@ PairType(t1,t2)
-  | Unpair(id1,id2,e1,e2) ->
-    chk_expr e1 >>=
-    pair_of_pairType "unpair: " >>= fun (t1,t2) ->
-    extend_tenv id1 t1 >>+
-    extend_tenv id2 t2 >>+
-    chk_expr e2  
+    else error "app: type of argument incorrect" 
   | Letrec(id,param,tParam,tRes,body,target) ->
     extend_tenv id (FuncType(tParam,tRes)) >>+
     (extend_tenv param tParam >>+
