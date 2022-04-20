@@ -29,8 +29,6 @@ open Ast
 %token RPAREN
 %token LBRACE
 %token RBRACE
-%token LANGLE
-%token RANGLE
 %token LET
 %token EQUALS
 %token IN
@@ -196,7 +194,7 @@ texpr:
     | BOOLTYPE { BoolType }
     | UNITTYPE { UnitType }
     | t1 = texpr; ARROW; t2 = texpr { FuncType(t1,t2) }
-    | LANGLE; t1 = texpr; TIMES; t2 = texpr; RANGLE { PairType(t1,t2) }
+    | t1 = texpr; TIMES; t2 = texpr { PairType(t1,t2) }
     | LPAREN; t1 = texpr; RPAREN { t1 }
     | REFTYPE; t1 = texpr { RefType(t1) }
     | LBRACE; ts = separated_list(SEMICOLON, fieldtype); RBRACE { RecordType(ts) }
