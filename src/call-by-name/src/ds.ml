@@ -12,7 +12,7 @@ type exp_val =
   | RecordVal of (string*exp_val) list
   | UnitVal
   | RefVal of int
-  | ThunkVal of Ast.expr*env
+  | Thunk of Ast.expr*env
 and
   env =
   | EmptyEnv
@@ -114,6 +114,13 @@ let fields_of_recordVal: exp_val -> ((string*exp_val) list) ea_result = function
   | RecordVal(fs) -> return fs
   | _ -> error "Expected a record!"
 
+let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+  fun ev ->
+  match ev with
+  | ProcVal(id,body,en) -> return (id,body,en)
+  | _ -> error "Expected a closure!"
+
+
 let rec string_of_list_of_strings = function
   | [] -> ""
   | [id] -> id
@@ -121,11 +128,11 @@ let rec string_of_list_of_strings = function
 
 
 let int_of_refVal =  function
-  |  RefVal n -> return n
+  | RefVal n -> return n
   | _ -> error "Expected a reference!"
 
 let rec string_of_expval = function
-  |  NumVal n -> "NumVal " ^ string_of_int n
+  | NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
   | ProcVal (id,body,env) -> "ProcVal ("^id^","^Ast.string_of_expr
                                body^","^ string_of_env' env^")"
@@ -138,11 +145,11 @@ let rec string_of_expval = function
   | RefVal i -> "RefVal ("^string_of_int i^")"
   | RecordVal(fs) -> "RecordVal("^ String.concat "," (List.map (fun (n,ev) ->
       n^"="^string_of_expval ev) fs) ^")"
-  | ThunkVal(e,en) -> "ThunkVal("^Ast.string_of_expr e ^","^string_of_env' en^")"
+  | Thunk(e,en) -> "Thunk("^Ast.string_of_expr e ^","^string_of_env' en^")"
 and
   string_of_env'  = function
   | EmptyEnv -> ""
-  | ExtendEnv(id,v,env) -> "("^id^","^string_of_expval v^")"^string_of_env' env
+  | ExtendEnv(id,v,env) -> string_of_env' env^"("^id^","^string_of_expval v^")"
   (* | ExtendEnvRec(id,param,body,env) -> "("^id^","^param^","^Ast.string_of_expr body^")"^string_of_env' env *)
 
 let string_of_env : string ea_result =
