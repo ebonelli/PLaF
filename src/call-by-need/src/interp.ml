@@ -8,23 +8,19 @@ let rec addIds fs evs =
   | [],[] -> []
   | (id,_)::t1, v::t2 -> (id,v):: addIds t1 t2
   | _,_ -> failwith "error: lists have different sizes"
-
-               
-let rec apply_proc : exp_val -> exp_val -> exp_val ea_result =
-  fun f a ->
-  match f with
-  | ProcVal (id,body,env) ->
-    return env >>+
-    (extend_env id a >>+
-        eval_expr body)
-  | _ -> error "App: Not a function"
+            
+let rec apply_clos : string*Ast.expr*env -> exp_val -> exp_val ea_result =
+  fun (id,e,en) ev ->
+  return en >>+
+  extend_env id ev >>+
+  eval_expr e
 and
   value_of_operand =
   fun op ->
   match op with
   | Var id -> apply_env id
   | _ -> lookup_env  >>= fun en ->
-    return (RefVal (Store.new_ref g_store (ThunkVal(op, en))))
+    return (RefVal (Store.new_ref g_store (Thunk(op, en))))
 and
   eval_expr : expr -> exp_val ea_result = fun e ->
   match e with
@@ -34,7 +30,7 @@ and
     int_of_refVal >>= fun l ->
     Store.deref g_store l >>= fun ev ->
     (match ev with
-     | ThunkVal(e,en) -> return en >>+ eval_expr e >>= fun ev ->
+     | Thunk(e,en) -> return en >>+ eval_expr e >>= fun ev ->
        Store.set_ref g_store l ev >>= fun _ ->
        return ev
     | _ -> return ev)
@@ -104,27 +100,11 @@ and
   | Proc(id,e)  ->
     lookup_env >>= fun en ->
     return (ProcVal(id,e,en))
-  (* | App(e1,e2)  -> 
-   *   eval_expr e1 >>= fun v1 ->
-   *   eval_expr e2 >>= fun v2 ->
-   *   apply_proc v1 v2 *)
-  | App(e1,e2)  -> 
-    eval_expr e1 >>= fun v1 ->
-    value_of_operand e2 >>= fun v2 ->
-    apply_proc v1 v2
-  (* | NewRef(e) ->
-   *   eval_expr e >>= fun ev ->
-   *   return (RefVal (Store.new_ref g_store ev))
-   * | DeRef(e) ->
-   *   eval_expr e >>=
-   *   int_of_refVal >>= 
-   *   Store.deref g_store
-   * | SetRef(e1,e2) ->
-   *   eval_expr e1 >>=
-   *   int_of_refVal >>= fun l ->
-   *   eval_expr e2 >>= fun ev ->
-   *   Store.set_ref g_store l ev >>= fun _ ->
-   *   return UnitVal    *)
+  | App(e1,e2)  ->
+    eval_expr e1 >>= 
+    clos_of_procVal >>= fun clos ->
+    value_of_operand e2 >>= 
+    apply_clos clos
   | Set(id,e) ->
     eval_expr e >>= fun ev ->
     apply_env id >>=
@@ -151,7 +131,7 @@ and
     let str_store = Store.string_of_store string_of_expval g_store 
     in (print_endline (str_env^"\n"^str_store);
     error "Reached breakpoint")
-  | _ -> error ("Not implemented: "^string_of_expr e)
+  | _ -> failwith ("Not implemented: "^string_of_expr e)
 
 
              

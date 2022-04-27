@@ -12,7 +12,7 @@ type exp_val =
   | RecordVal of (string*exp_val) list
   | UnitVal
   | RefVal of int
-  | ThunkVal of Ast.expr*env
+  | Thunk of Ast.expr*env
 and
   env =
   | EmptyEnv
@@ -95,11 +95,11 @@ let lookup_env : env ea_result =
 (* operations on expressed values *)
         
 let int_of_numVal : exp_val -> int ea_result =  function
-  |  NumVal n -> return n
+  | NumVal n -> return n
   | _ -> error "Expected a number!"
 
 let bool_of_boolVal : exp_val -> bool ea_result =  function
-  |  BoolVal b -> return b
+  | BoolVal b -> return b
   | _ -> error "Expected a boolean!"
 
 let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result = function
@@ -121,11 +121,19 @@ let rec string_of_list_of_strings = function
 
 
 let int_of_refVal =  function
-  |  RefVal n -> return n
+  | RefVal n -> return n
   | _ -> error "Expected a reference!"
 
+
+let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+  fun ev ->
+  match ev with
+  | ProcVal(id,body,en) -> return (id,body,en)
+  | _ -> error "Expected a closure!"
+
+
 let rec string_of_expval = function
-  |  NumVal n -> "NumVal " ^ string_of_int n
+  | NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
   | ProcVal (id,body,env) -> "ProcVal ("^id^","^Ast.string_of_expr
                                body^","^ string_of_env' env^")"
@@ -138,11 +146,11 @@ let rec string_of_expval = function
   | RefVal i -> "RefVal ("^string_of_int i^")"
   | RecordVal(fs) -> "RecordVal("^ String.concat "," (List.map (fun (n,ev) ->
       n^"="^string_of_expval ev) fs) ^")"
-  | ThunkVal(e,en) -> "ThunkVal("^Ast.string_of_expr e ^","^string_of_env' en^")"
+  | Thunk(e,en) -> "Thunk("^Ast.string_of_expr e ^","^string_of_env' en^")"
 and
   string_of_env'  = function
   | EmptyEnv -> ""
-  | ExtendEnv(id,v,env) -> "("^id^","^string_of_expval v^")"^string_of_env' env
+  | ExtendEnv(id,v,env) -> string_of_env' env^"("^id^","^string_of_expval v^")"
   (* | ExtendEnvRec(id,param,body,env) -> "("^id^","^param^","^Ast.string_of_expr body^")"^string_of_env' env *)
 
 let string_of_env : string ea_result =
