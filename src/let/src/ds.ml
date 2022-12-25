@@ -7,6 +7,7 @@ type exp_val =
   | NumVal of int
   | BoolVal of bool
   | PairVal of exp_val*exp_val
+  | TupleVal of exp_val list
 type env =
   | EmptyEnv
   | ExtendEnv of string*exp_val*env
@@ -46,7 +47,16 @@ let run : 'a ea_result -> 'a result =
 
 let lookup : env ea_result = fun env ->
   Ok env
-  
+
+let rec sequence : 'a ea_result list -> 'a list ea_result =
+  fun l ->
+  match l with
+  | [] -> return []
+  | h::t ->
+    h >>= fun ev ->
+    sequence t >>= fun evs ->
+    return (ev::evs)
+      
 (* Operations on environments *)
 
 let empty_env : unit -> env ea_result = fun () ->
@@ -55,6 +65,20 @@ let empty_env : unit -> env ea_result = fun () ->
 let extend_env : string -> exp_val -> env ea_result = fun id v env ->
   Ok (ExtendEnv(id,v,env))
 
+let rec extend_env_list_helper =
+  fun ids evs en ->
+  match ids,evs with
+  | [],[] -> en
+  | id::idt,ev::evt ->
+    ExtendEnv(id,ev,extend_env_list_helper idt evt en)
+  | _,_ -> failwith
+             "extend_env_list_helper: ids and evs have different sizes"
+  
+let extend_env_list =
+  fun ids evs ->
+  fun en ->
+  Ok (extend_env_list_helper ids evs en)
+    
 let rec apply_env : string -> exp_val ea_result = fun id env ->
   match env with
   | EmptyEnv -> Error (id^" not found!")
@@ -75,6 +99,10 @@ let bool_of_boolVal : exp_val -> bool ea_result =  function
   |  BoolVal b -> return b
   | _ -> error "Expected a boolean!"
 
+let list_of_tupleVal : exp_val -> (exp_val list)  ea_result =  function
+  |  TupleVal l -> return l
+  | _ -> error "Expected a tuple!"
+           
 let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result =  function
   |  PairVal(ev1,ev2) -> return (ev1,ev2)
   | _ -> error "Expected a pair!"

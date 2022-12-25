@@ -66,7 +66,10 @@ and
     eval_expr e >>=
     pair_of_pairVal >>= fun p ->
     return @@ snd p
-  | Proc(id,_t,e)  ->
+  | Proc(id,e)   ->
+    lookup_env >>= fun en ->
+    return (ProcVal(id,e,en))
+  | ProcT(id,_t,e)  ->
     lookup_env >>= fun en ->
     return (ProcVal(id,e,en))
   | App(e1,e2)  -> 

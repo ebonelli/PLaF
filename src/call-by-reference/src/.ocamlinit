@@ -2,6 +2,7 @@
 open Cbref.ReM;;
 open Cbref.Ast;;
 open Cbref.Interp;;
+open Cbref.Parser_main;;
 (* Added by OPAM. *)
 let () =
   try Topdirs.dir_directory (Sys.getenv "OCAML_TOPLEVEL_PATH")

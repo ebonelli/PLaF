@@ -1,16 +1,10 @@
 open Ast
 open Ds
-    
+open Parser_main
+  
 let g_store = Store.empty_store 20 (NumVal 0)
 
-
-let rec apply_clos : string*Ast.expr*env -> exp_val -> exp_val ea_result =
-  fun (id,e,en) ev ->
-  return en >>+
-  extend_env id (RefVal (Store.new_ref g_store ev)) >>+
-  eval_expr e
-and
-  eval_expr : expr -> exp_val ea_result = fun e ->
+let rec eval_expr : expr -> exp_val ea_result = fun e ->
   match e with
   | Int(n) -> return @@ NumVal n
   | Var(id) -> 
@@ -62,14 +56,14 @@ and
     eval_expr e1 >>= fun ev1 ->
     eval_expr e2 >>= fun ev2 ->
     return @@ PairVal(ev1,ev2)
-  (* | Fst(e) ->
-   *   eval_expr e >>=
-   *   pair_of_pairVal >>= fun p ->
-   *   return @@ fst p 
-   * | Snd(e) ->
-   *   eval_expr e >>=
-   *   pair_of_pairVal >>= fun p ->
-   *   return @@ snd p *)
+  | Fst(e) ->
+    eval_expr e >>=
+    pair_of_pairVal >>= fun p ->
+    return @@ fst p 
+  | Snd(e) ->
+    eval_expr e >>=
+    pair_of_pairVal >>= fun p ->
+    return @@ snd p
   | Unpair(id1,id2,def,target) ->
     eval_expr def >>=
     pair_of_pairVal >>= fun (ev1,ev2) ->
@@ -79,21 +73,22 @@ and
     extend_env id1 (RefVal l1) >>+
     extend_env id2 (RefVal l2) >>+
     eval_expr target
-  | Proc(id,e)  ->
+  | Proc(id,_,e)  ->
     lookup_env >>= fun en ->
     return (ProcVal(id,e,en))
   | App(e1,e2)  -> 
     eval_expr e1 >>= 
-    clos_of_procVal >>= fun clos ->
-    eval_expr e2 >>= 
-    apply_clos clos
-  | Letrec(id,par,e,target) ->
+    clos_of_procVal >>= fun (id,e,en) ->
+    eval_expr e2 >>= fun ev ->
+    return en >>+
+    extend_env id (RefVal (Store.new_ref g_store ev)) >>+
+    eval_expr e
+  | Letrec(id,par,_,_,e,target) ->
     let l = Store.new_ref g_store UnitVal in
     extend_env id (RefVal l) >>+
     (lookup_env >>= fun env ->
      Store.set_ref g_store l (ProcVal(par,e,env)) >>= fun _ ->
-      eval_expr target
-    )
+      eval_expr target)
   | Set(id,e) ->
     eval_expr e >>= fun ev ->
     apply_env id >>=
@@ -103,52 +98,17 @@ and
   | BeginEnd(es) ->
     List.fold_left (fun c e -> c >>= fun _ -> eval_expr e) (return UnitVal) es
   | Debug(_e) ->
-        string_of_env >>= fun str_env ->
+    string_of_env >>= fun str_env ->
     let str_store = Store.string_of_store string_of_expval g_store 
     in (print_endline (str_env^"\n"^str_store);
         error "Debug called")
   | _ -> failwith ("Not implemented: "^string_of_expr e)
-
-
-
-(***********************************************************************)
-(* Everything above this is essentially the same as we saw in lecture. *)
-(***********************************************************************)
-
-(* Parse a string into an ast *)
-
-let parse s =
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.prog Lexer.read lexbuf in
-  ast
-
-let lexer s =
-  let lexbuf = Lexing.from_string s
-  in Lexer.read lexbuf 
-
+and
+  eval_prog (AProg(_,e)) =
+  eval_expr e   
 
 (* Interpret an expression *)
 let interp (s:string) : exp_val result =
-  let c = s |> parse |> eval_expr
+  let c = s |> parse |> eval_prog
   in run c
 
-
-let ex3 = "
-let x = 0
-in letrec even(dummy) 
-            = if zero?(x)
-              then 1 
-              else begin 
-                    set x = x-1; 
-                    (odd 888) 
-                   end 
-          odd(dummy) 
-            = if zero?(x)
-              then 0 
-              else begin 
-                    set x = x-1;
-                    (even 888) 
-                   end 
-   in begin set x = 13; 
-            (odd -888) 
-      end "

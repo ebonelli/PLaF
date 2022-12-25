@@ -29,9 +29,11 @@ open Ast
 %token RPAREN
 %token LBRACE
 %token RBRACE
+%token LANGLE
+%token RANGLE
+%token ABS
 %token LET
 %token EQUALS
-%token EQUALSMUTABLE
 %token IN
 %token PROC
 %token ISZERO
@@ -46,13 +48,37 @@ open Ast
 %token DEREF
 %token SETREF
 %token SEMICOLON
+%token COLON
 %token FST
 %token SND
 %token PAIR
 %token UNPAIR
+%token UNTUPLE
 %token DEBUG
+%token SEND
+%token CLASS
+%token EXTENDS
+%token SUPER
+%token METHOD
+%token SELF
+%token FIELD
+%token NEW
+%token LIST
+%token CONS 
+%token HD 
+%token TL
+%token EMPTYPRED 
 %token COMMA
 %token DOT
+%token IMPLEMENTS
+%token INSTANCEOF
+%token INTERFACE
+%token CAST
+%token INTTYPE "int"
+%token BOOLTYPE "bool"
+%token UNITTYPE "unit"
+%token ARROW "->"  (* token alias to aid readability *)
+%token REFTYPE "ref"
 %token EOF
 
 (* After declaring the tokens, we have to provide some additional information
@@ -66,11 +92,12 @@ open Ast
    Because PLUS has higher precedence than IN, "let x=1 in x+2" will
    parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
 
-%nonassoc IN ELSE EQUALS  EQUALSMUTABLE           /* lowest precedence */
+%nonassoc IN ELSE EQUALS            /* lowest precedence */
+%right ARROW
 %left PLUS MINUS
 %left TIMES DIVIDED   
-%left DOT    /* highest precedence */
-
+%left DOT    
+%nonassoc REFTYPE                   /* highest precedence */
                           (*%nonassoc UMINUS        /* highest precedence */*)
 
 
@@ -80,7 +107,7 @@ open Ast
    The declaration also says that parsing a [prog] will return an OCaml
    value of type [Ast.expr]. *)
 
-%start <Ast.expr> prog
+%start <Ast.prog> prog
 
 (* The following %% ends the declarations section of the grammar definition. *)
 
@@ -112,7 +139,7 @@ open Ast
    the resulting value to [e].  The action simply says to return that value [e]. *)
 
 prog:
-	| e = expr; EOF { e }
+	| cls = list(iface_or_class_decl); e = expr; EOF { AProg(cls,e) }
 	;
 
 (* The second rule, named [expr], has productions for integers, variables,
@@ -141,45 +168,113 @@ prog:
      expression is bound to [e] and returned. *)
 
 expr:
-    | i = INT { Int i }
-    | x = ID { Var x }
-    | DEBUG; LPAREN; e=expr; RPAREN { Debug(e) }
-    | e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
-    | e1 = expr; MINUS; e2 = expr { Sub(e1,e2) }
-    | e1 = expr; TIMES; e2 = expr { Mul(e1,e2) }
-    | e1 = expr; DIVIDED; e2 = expr { Div(e1,e2) }
-    | PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
-    | FST; LPAREN; e=expr; RPAREN { Fst(e) }
-    | SND; LPAREN; e=expr; RPAREN { Snd(e) }
-    | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
-    | LETREC; x = ID; LPAREN; y = ID; RPAREN; EQUALS; e1 = expr; IN; e2 = expr { Letrec(x,y,e1,e2) }
-    | PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,e) }
-    | LPAREN; e1 = expr; e2 = expr; RPAREN { App(e1,e2) }
-    | ISZERO; LPAREN; e = expr; RPAREN { IsZero(e) }
-    | NEWREF; LPAREN; e = expr; RPAREN { NewRef(e) }
-    | DEREF; LPAREN; e = expr; RPAREN { DeRef(e) }
-    | SETREF; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { SetRef(e1,e2) }
-    | IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { ITE(e1,e2,e3) }
-    | SET; x = ID; EQUALS; e = expr { Set(x,e) }
-    | BEGIN; es = exprs; END { BeginEnd(es) }
-    | LPAREN; e = expr; RPAREN {e}
-      (*    | MINUS e = expr %prec UMINUS { SubExp(IntExp 0,e) }*)
-    | LPAREN; MINUS e = expr; RPAREN  { Sub(Int 0, e) }
-    | LPAREN; RPAREN { Unit }
-    | LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Pair(e1,e2) }
-    | UNPAIR; LPAREN; x = ID; COMMA; y=ID; RPAREN; EQUALS; e1 = expr;
-      IN; e2 = expr { Unpair(x,y,e1,e2) }
-    | LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
-    | e1=expr; DOT; id=ID { Proj(e1,id) }
-    | e1=expr; DOT; id=ID; EQUALSMUTABLE; e=expr { SetField(e1,id,e) }
-    ;
-
+| i = INT { Int i }
+| x = ID { Var x }
+| DEBUG; LPAREN; e=expr; RPAREN { Debug(e) }
+| e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
+| e1 = expr; MINUS; e2 = expr { Sub(e1,e2) }
+| e1 = expr; TIMES; e2 = expr { Mul(e1,e2) }
+| e1 = expr; DIVIDED; e2 = expr { Div(e1,e2) }
+| ABS; LPAREN; e=expr; RPAREN { Abs(e) }
+| PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
+| FST; LPAREN; e=expr; RPAREN { Fst(e) }
+| SND; LPAREN; e=expr; RPAREN { Snd(e) }
+| LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
+| LETREC; x = ID; LPAREN; y = ID; RPAREN; EQUALS; e1 = expr; IN;
+  e2 = expr { Letrec(x,y,None,None,e1,e2) }
+| LETREC; x = ID; LPAREN; y = ID; COLON; targ=texpr; RPAREN; COLON
+  ; tres=texpr; EQUALS; e1 = expr; IN;
+  e2 = expr { Letrec(x,y,Some targ,Some tres,e1,e2) }
+| PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,None,e) }
+| PROC; LPAREN; x = ID; COLON; t=texpr; RPAREN; LBRACE; e = expr;
+  RBRACE { Proc(x,Some t,e) }
+| LPAREN; e1 = expr; e2 = expr; RPAREN { App(e1,e2) }
+| ISZERO; LPAREN; e = expr; RPAREN { IsZero(e) }
+| NEWREF; LPAREN; e = expr; RPAREN { NewRef(e) }
+| DEREF; LPAREN; e = expr; RPAREN { DeRef(e) }
+| SETREF; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { SetRef(e1,e2) }
+| IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { ITE(e1,e2,e3) }
+| SET; x = ID; EQUALS; e = expr { Set(x,e) }
+| BEGIN; es = exprs; END { BeginEnd(es) }
+| LPAREN; e = expr; RPAREN {e}
+  (*    | MINUS e = expr %prec UMINUS { SubExp(IntExp 0,e) }*)
+| LPAREN; MINUS e = expr; RPAREN  { Sub(Int 0, e) }
+| LPAREN; RPAREN { Unit }
+| LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Pair(e1,e2) }
+| UNPAIR; LPAREN; x = ID; COMMA; y=ID; RPAREN; EQUALS; e1 = expr;
+  IN; e2 = expr { Unpair(x,y,e1,e2) }
+| LANGLE; es = separated_list(COMMA, expr) ; RANGLE { Tuple(es) }
+| UNTUPLE; LANGLE; is = separated_list(COMMA, ID) ;RANGLE; EQUALS; e1 = expr; IN;
+      e2 = expr { Untuple(is,e1,e2) }
+| LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
+| e1=expr; DOT; id=ID { Proj(e1,id) }
+| NEW; id=ID; LPAREN; args = separated_list(COMMA, expr);
+  RPAREN { NewObject(id,args) }
+| SELF; { Self }
+| SEND; e=expr; id=ID; LPAREN; args = separated_list(COMMA, expr);
+  RPAREN { Send(e,id,args) }
+| SUPER; id=ID; LPAREN; args = separated_list(COMMA, expr);
+  RPAREN { Super(id,args) }
+| LIST; LPAREN; es= separated_list(COMMA, expr); RPAREN { List(es)}
+| HD; LPAREN; e = expr; RPAREN { Hd(e) }
+| TL; LPAREN; e = expr; RPAREN { Tl(e) }
+| EMPTYPRED; LPAREN; e = expr; RPAREN { IsEmpty(e) }
+| CONS; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Cons(e1,e2) }
+| INSTANCEOF LPAREN; e=expr; COMMA; id=ID; RPAREN { IsInstanceOf(e,id) }
+| CAST; LPAREN; e1=expr; COMMA; id=ID; RPAREN { Cast(e1,id) }
+    
+      
 field:
-    | id = ID; EQUALS; e=expr { (id,(false,e)) }
-    | id = ID; EQUALSMUTABLE; e=expr { (id,(true,e)) }
-    ;
-
+| id = ID; EQUALS; e=expr { (id,e) }
+    
+fieldtype:
+| id = ID; COLON; t=texpr { (id,t) }
+    
 exprs:
-    es = separated_list(SEMICOLON, expr)    { es } ;
+| es = separated_list(SEMICOLON, expr)    { es }
+      
+iface_or_class_decl:
+| CLASS; id1=ID; EXTENDS; id2=ID; LBRACE; ofs = list(obj_fields);
+      mths = list(method_decl); RBRACE
+      { Class(id1,id2,None,ofs,mths)}
+| CLASS; id1=ID; EXTENDS; id2=ID; IMPLEMENTS; id3=ID; LBRACE; ofs = list(obj_fields);
+      mths = list(method_decl);
+      RBRACE { Class(id1,id2,Some id3,ofs,mths)}
+| INTERFACE; id=ID; LBRACE; amths = list(abstract_method_decl);
+      RBRACE { Interface(id,amths)}
+      
+obj_fields:
+| FIELD; id=ID { (id,None) }
+| FIELD; t=texpr; id=ID { (id,Some t) }
+         
+method_decl:
+| METHOD; id=ID; LPAREN;
+         params = separated_list(COMMA, formal_par); RPAREN; LBRACE;
+         e=expr; RBRACE
+         { Method(id,None,params,e) }
+| METHOD; retType=texpr; id=ID; LPAREN;
+       params = separated_list(COMMA, formal_par); RPAREN; LBRACE;
+       e=expr; RBRACE
+       { Method(id,Some retType,params,e) }
+                
+abstract_method_decl:
+| METHOD; retType=texpr; id=ID; LPAREN; params = separated_list(COMMA, formal_par); RPAREN
+         { MethodAbs(id,retType,params) }
+                  
+formal_par:
+| id=ID;  { (id,None) }
+| id=ID; COLON; t=texpr { (id,Some t) }
+                  
+texpr:
+| id=ID { UserType(id) }
+| "int" { IntType }
+| "bool" { BoolType }
+| "unit" { UnitType }
+| t1 = texpr; "->"; t2 = texpr { FuncType(t1,t2) }
+| t1 = texpr; TIMES; t2 = texpr { PairType(t1,t2) }
+| LPAREN; t1 = texpr; RPAREN { t1 }
+| "ref"; t1 = texpr { RefType(t1) }
+| LBRACE; ts = separated_list(SEMICOLON, fieldtype); RBRACE { RecordType(ts) }
+     
 
-(* And that's the end of the grammar definition. *)
+    

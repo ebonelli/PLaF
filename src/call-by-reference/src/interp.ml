@@ -1,19 +1,10 @@
 open Ast
 open Ds
+open Parser_main
     
 let g_store = Store.empty_store 20 (NumVal 0)
 
-
-
-let rec apply_proc ev rval =
-  match ev with
-  | ProcVal(par,body,en) ->
-    return en >>+
-    extend_env par rval >>+
-    eval_expr body
-  | _ -> error "Tried to apply a non-closure"
-and
-  value_of_operand e =
+let rec value_of_operand e =
   match e with
   | Var id -> apply_env id
   | _ -> eval_expr e >>= fun ev ->
@@ -79,14 +70,17 @@ and
     eval_expr e >>=
     pair_of_pairVal >>= fun p ->
     return @@ snd p
-  | Proc(id,e)  ->
+  | Proc(id,_,e)  ->
     lookup_env >>= fun en ->
     return (ProcVal(id,e,en))
   | App(e1,e2)  -> 
-    eval_expr e1 >>= fun v ->
-    value_of_operand e2 >>= fun rval ->
-    apply_proc v rval
-  | Letrec(id,par,e,target) ->
+    eval_expr e1 >>= 
+    clos_of_procVal >>= fun (id,e,en) ->
+    value_of_operand e2 >>= fun refval ->
+    return en >>+
+    extend_env id refval >>+
+    eval_expr e
+  | Letrec(id,par,_,_,e,target) ->
     let l = Store.new_ref g_store UnitVal in
     extend_env id (RefVal l) >>+
     (lookup_env >>= fun env ->
@@ -106,18 +100,13 @@ and
     in (print_endline (str_env^"\n"^str_store);
     error "Reached breakpoint")
   | _ -> failwith ("Not implemented: "^string_of_expr e)
+and
+  eval_prog (AProg(_,e)) =
+  eval_expr e   
 
-
-
-(** [parse s] parses string [s] into an ast *)
-let parse (s:string) : expr =
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.prog Lexer.read lexbuf in
-  ast
-
-
-(** [interp s] parses [s] and then evaluates it *)
+(* Interpret an expression *)
 let interp (s:string) : exp_val result =
-  let c = s |> parse |> eval_expr
+  let c = s |> parse |> eval_prog
   in run c
+
 

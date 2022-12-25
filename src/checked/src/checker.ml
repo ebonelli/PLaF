@@ -28,10 +28,12 @@ let rec chk_expr : expr -> texpr tea_result = function
     chk_expr e >>= fun t ->
     extend_tenv id t >>+
     chk_expr body
-  | Proc(var,t1,e) ->
+  | ProcT(var,t1,e) ->
     extend_tenv var t1 >>+
     chk_expr e >>= fun t2 ->
     return @@ FuncType(t1,t2)
+  | Proc(_var,_e) ->
+    error "proc: type declaration missing"
   | App(e1,e2) ->
     chk_expr e1 >>=
     pair_of_funcType "app: " >>= fun (t1,t2) ->

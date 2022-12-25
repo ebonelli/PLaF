@@ -102,16 +102,15 @@ let tupleVal_to_list_of_evs: exp_val -> (exp_val list) ea_result = function
   | TupleVal(evs) -> return evs
   | _ -> error "Expected a tuple!"
 
-
-let rec string_of_list_of_strings = function
-  | [] -> ""
-  | [id] -> id
-  | id::ids -> id ^ "," ^ string_of_list_of_strings ids
-
-
 let int_of_refVal =  function
   |  RefVal n -> return n
   | _ -> error "Expected a reference!"
+
+let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+  fun ev ->
+  match ev with
+  | ProcVal(id,body,en) -> return (id,body,en)
+  | _ -> error "Expected a closure!"
 
 let rec string_of_expval = function
   |  NumVal n -> "NumVal " ^ string_of_int n
@@ -120,7 +119,7 @@ let rec string_of_expval = function
                                body^","^ string_of_env' env^")"
   | PairVal(v1,v2) -> "PairVal("^string_of_expval
                         v1^","^string_of_expval v2^")"
-  | TupleVal(evs) ->  "Tuple (" ^ string_of_list_of_strings (List.map
+  | TupleVal(evs) ->  "Tuple (" ^ String.concat "," (List.map
                                                    string_of_expval
                                                    evs)  ^ ")" 
   | UnitVal -> "UnitVal " 

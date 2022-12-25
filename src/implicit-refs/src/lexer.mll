@@ -23,13 +23,12 @@ exception Error of string
    FYI, these aren't exactly the same as the OCaml definitions of integers and
    identifiers. *)
 
-let white = [' ' '\t' '\n']+
-let digit = ['0'-'9']
-let int = digit+
-let letter = ['a'-'z' 'A'-'Z']
-let id = letter ['a'-'z' 'A'-'Z' '0'-'9' '_']*
-
 let whitespace_char_no_newline = [' ' '\t' '\012' '\r']
+let non_zero_digit = ['1'-'9']
+let digit = ['0'-'9']
+let int = non_zero_digit digit*
+let letter = ['a'-'z' 'A'-'Z']
+let id = letter ['a'-'z' 'A'-'Z' '0'-'9' '_' '?']*
 
 (* The final section of the lexer definition defines how to parse a character
    stream into a token stream.  Each of the rules below has the form
@@ -40,7 +39,10 @@ let whitespace_char_no_newline = [' ' '\t' '\012' '\r']
 
 rule read =
   parse
-  | white    { read lexbuf }
+  | whitespace_char_no_newline+    { read lexbuf }
+  | '\n'     { Lexing.new_line lexbuf; read lexbuf }
+  | "(*"     { comment lexbuf; read lexbuf } (* activate "comment" rule *)           
+  | int      { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | "+"      { PLUS }
   | "-"      { MINUS }
   | "*"      { TIMES }
@@ -49,9 +51,13 @@ rule read =
   | ")"      { RPAREN }
   | "{"      { LBRACE }
   | "}"      { RBRACE }
+  | "<"      { LANGLE }
+  | ">"      { RANGLE }
   | ";"      { SEMICOLON }
+  | ":"      { COLON }
   | ","      { COMMA }
   | "."      { DOT }
+  | "abs"    { ABS }
   | "let"    { LET }
   | "="      { EQUALS }
   | "in"     { IN }
@@ -61,7 +67,7 @@ rule read =
   | "then"   { THEN }
   | "else"   { ELSE }
   | "letrec" { LETREC }
-  | "set"     { SET }
+  | "set"    { SET }
   | "begin"  { BEGIN }
   | "end"    { END }
   | "newref" { NEWREF }
@@ -72,26 +78,42 @@ rule read =
   | "snd"   { SND }
   | "pair"   { PAIR }
   | "unpair" { UNPAIR }
-  | "//"     { singleline_comment lexbuf; initial_linebegin lexbuf }
-  | "(*"     { multiline_comment lexbuf } (* activate "comment" rule *)
+  | "untuple" { UNTUPLE }
+  | "send"   { SEND }
+  | "class"   { CLASS }
+  | "super"   { SUPER }
+  | "extends" { EXTENDS }
+  | "method" { METHOD }
+  | "field"   { FIELD }
+  | "self"   { SELF }
+  | "new"   { NEW }
+  | "list"   { LIST }
+  | "cons"   { CONS }
+  | "hd"   { HD }
+  | "tl"   { TL }
+  | "empty?"   { EMPTYPRED }
+  | "implements"  { IMPLEMENTS }
+  | "instanceof?"  { INSTANCEOF }
+  | "interface"  { INTERFACE }
+  | "cast"  { CAST }
+  | "int"    { INTTYPE }
+  | "bool"   { BOOLTYPE }
+  | "unit"   { UNITTYPE }
+  | "->"     { ARROW }
+  | "ref"    { REFTYPE }
   | id       { ID (Lexing.lexeme lexbuf) }
-  | int      { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof      { EOF }
   | _
       { raise (Error (Printf.sprintf
                         "At offset %d: unexpected character."
                         (Lexing.lexeme_start lexbuf))) }
-and multiline_comment = parse
-  | "*)" { read lexbuf }
-  | eof    { failwith "unterminated comment" }
-  | _    { multiline_comment lexbuf }  (* skip comments *)
-and initial_linebegin = parse
-  | '\n'                          { Lexing.new_line lexbuf; initial_linebegin lexbuf }
-  | whitespace_char_no_newline    { initial_linebegin lexbuf }
-  | ""                            { read lexbuf }
-(* Single-line comment terminated by a newline *)
-and singleline_comment = parse
-  | '\n'   { Lexing.new_line lexbuf }
-  | eof    { () }
-  | _      { singleline_comment lexbuf }
+and
+  comment = parse
+  | "*)" { () }
+  | '\n'     { Lexing.new_line lexbuf; comment lexbuf }
+  | eof  { failwith "unterminated comment" }
+  | _    { comment lexbuf }  (* skip comments *)
 
+
+
+(* And that's the end of the lexer definition. *)

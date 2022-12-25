@@ -119,18 +119,15 @@ let rec string_of_list_of_strings = function
   | [id] -> id
   | id::ids -> id ^ "," ^ string_of_list_of_strings ids
 
-
 let int_of_refVal =  function
   | RefVal n -> return n
   | _ -> error "Expected a reference!"
-
 
 let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
   fun ev ->
   match ev with
   | ProcVal(id,body,en) -> return (id,body,en)
   | _ -> error "Expected a closure!"
-
 
 let rec string_of_expval = function
   | NumVal n -> "NumVal " ^ string_of_int n

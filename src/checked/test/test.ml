@@ -17,7 +17,7 @@ let tests_let = [
 
 let tests_proc = [
   "int"  >:: (fun _ -> assert_equal (Ok (NumVal 3))
-                 (interp "(proc (x) { x+1 } 2)"))
+                 (interp "(proc (x:int) { x+1 } 2)"))
 ]
 
 let tests_rec = [
@@ -78,12 +78,12 @@ let tests_checked = [
     "unpair_proc " >::
         (fun _ -> assert_equal
             (Ok (FuncType ((PairType (IntType, BoolType)), (PairType (BoolType, IntType)))))
-            (chk "proc (z:<int*bool>) { unpair(x, y) = z in pair(y, x) }"));
+            (chk "proc (z:int*bool) { unpair(x, y) = z in pair(y, x) }"));
 
     "pair_bool_int " >::
         (fun _ -> assert_equal
             (Ok (PairType (BoolType, IntType)))
-            (chk "let f = proc (z:<int*bool>) { unpair (x,y)=z in pair(y,x) } in (f pair (1, zero?(0)))"));
+            (chk "let f = proc (z:int*bool) { unpair (x,y)=z in pair(y,x) } in (f pair (1, zero?(0)))"));
 
     (* list *)
     (* tree *)

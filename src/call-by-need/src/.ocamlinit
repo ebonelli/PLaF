@@ -1,6 +1,7 @@
-open Cbneed_refs.Interp;;
-open Cbneed_refs.Ds;;
-open Cbneed_refs.Ast;;
+open Cbneed.Interp;;
+open Cbneed.Ds;;
+open Cbneed.Ast;;
+open Cbneed.Parser_main;;
 (* Added by OPAM. *)
 let () =
   try Topdirs.dir_directory (Sys.getenv "OCAML_TOPLEVEL_PATH")

@@ -10,7 +10,8 @@ type expr =
   | Let of string*expr*expr
   | IsZero of expr
   | ITE of expr*expr*expr
-  | Proc of string*texpr*expr
+  | Proc of string*expr
+  | ProcT of string*texpr*expr
   | App of expr*expr
   | Letrec of string*string*texpr*texpr*expr*expr
   | Unit
@@ -53,7 +54,8 @@ let rec string_of_expr e =
   | DeRef(e) -> "DeRef(" ^ (string_of_expr e) ^ ")"
   | SetRef(e1,e2) -> "SetRef(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
   | Let(x,def,body) -> "Let("^x^","^string_of_expr def ^","^ string_of_expr body ^")"
-  | Proc(x,t,body) -> "Proc("^x^":"^string_of_texpr t^"," ^ string_of_expr body ^")"
+  | Proc(x,body) -> "Proc("^x^"," ^ string_of_expr body ^")"
+  | ProcT(x,t,body) -> "Proc("^x^":"^string_of_texpr t^"," ^ string_of_expr body ^")"
   | App(e1,e2) -> "App("^string_of_expr e1 ^"," ^ string_of_expr e2^")"
   | IsZero(e) -> "Zero?("^string_of_expr e ^")"
   | ITE(e1,e2,e3) -> "IfThenElse("^string_of_expr e1^"," ^ string_of_expr e2^"," ^ string_of_expr e3  ^")"

@@ -161,7 +161,9 @@ expr:
     | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
     | LETREC; x = ID; LPAREN; y = ID; COLON; targ=texpr; RPAREN; COLON
       ; tr=texpr; EQUALS; e1 = expr; IN; e2 = expr { Letrec(x,y,targ,tr,e1,e2) }
-    | PROC; LPAREN; x = ID; COLON; t=texpr; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,t,e) }
+    | PROC; LPAREN; x = ID RPAREN; LBRACE; e = expr; RBRACE { Proc(x,e) }
+    | PROC; LPAREN; x = ID; COLON; t=texpr; RPAREN; LBRACE; e = expr; RBRACE { ProcT(x,t,e) }
+    | PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,e) }
     | LPAREN; e1 = expr; e2 = expr; RPAREN { App(e1,e2) }
     | ISZERO; LPAREN; e = expr; RPAREN { IsZero(e) }
     | NEWREF; LPAREN; e = expr; RPAREN { NewRef(e) }
