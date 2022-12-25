@@ -1,0 +1,5 @@
+(lang dune 3.2)
+(name sool)
+(using menhir 2.0)
+(version unreleased)
+

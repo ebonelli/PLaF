@@ -23,10 +23,9 @@ exception Error of string
    FYI, these aren't exactly the same as the OCaml definitions of integers and
    identifiers. *)
 
-let whitespace_char_no_newline = [' ' '\t' '\012' '\r']
-let non_zero_digit = ['1'-'9']
+let whitespace_char_no_newline = [' ' '\t' '\012' '\r']+
 let digit = ['0'-'9']
-let int = non_zero_digit digit*
+let int = digit digit*
 let letter = ['a'-'z' 'A'-'Z']
 let id = letter ['a'-'z' 'A'-'Z' '0'-'9' '_' '?']*
 
@@ -39,9 +38,9 @@ let id = letter ['a'-'z' 'A'-'Z' '0'-'9' '_' '?']*
 
 rule read =
   parse
-  | whitespace_char_no_newline+    { read lexbuf }
+  | whitespace_char_no_newline    { read lexbuf }
   | '\n'     { Lexing.new_line lexbuf; read lexbuf }
-  | "(*"     { comment lexbuf; read lexbuf } (* activate "comment" rule *)           
+  | "(*"     { comment lexbuf; read lexbuf } (* activate "comment" rule *)                 
   | int      { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | "+"      { PLUS }
   | "-"      { MINUS }
@@ -51,8 +50,6 @@ rule read =
   | ")"      { RPAREN }
   | "{"      { LBRACE }
   | "}"      { RBRACE }
-  | "<"      { LANGLE }
-  | ">"      { RANGLE }
   | ";"      { SEMICOLON }
   | ":"      { COLON }
   | ","      { COMMA }
@@ -78,7 +75,6 @@ rule read =
   | "snd"   { SND }
   | "pair"   { PAIR }
   | "unpair" { UNPAIR }
-  | "untuple" { UNTUPLE }
   | "send"   { SEND }
   | "class"   { CLASS }
   | "super"   { SUPER }

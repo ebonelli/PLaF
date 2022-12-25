@@ -1,0 +1,35 @@
+class counter extends object {
+  field c
+  method initialize() { set c=7 }
+  method add(i) { set c=c+i }
+  method bump() { send self add(1) }
+  method read() { c }
+}
+
+class resetc extends counter {
+  method reset() { set c=0}
+}
+
+class bkpc extends resetc {
+  field b
+  method initialize() {
+  begin
+    super initialize();
+    set b=12
+    end }
+  method add(i) {
+      begin
+	send self backup();
+	super add(i)
+      end }
+  method backup() { set b=c }
+  method restore() { set c=b}
+ }
+
+let o = new bkpc()
+in begin
+     send o add(10); 
+     send o bump();
+     send o restore();
+     send o read()
+   end
