@@ -1,7 +1,7 @@
 open Ast
 open ReM
 open Dst
-
+open Parser_main
 
 let rec chk_expr : expr -> texpr tea_result = function 
   | Int _n -> return IntType
@@ -28,11 +28,11 @@ let rec chk_expr : expr -> texpr tea_result = function
     chk_expr e >>= fun t ->
     extend_tenv id t >>+
     chk_expr body
-  | ProcT(var,t1,e) ->
+  | Proc(var,Some t1,e) ->
     extend_tenv var t1 >>+
     chk_expr e >>= fun t2 ->
     return @@ FuncType(t1,t2)
-  | Proc(_var,_e) ->
+  | Proc(_var,None,_e) ->
     error "proc: type declaration missing"
   | App(e1,e2) ->
     chk_expr e1 >>=
@@ -40,8 +40,10 @@ let rec chk_expr : expr -> texpr tea_result = function
     chk_expr e2 >>= fun t3 ->
     if t1=t3
     then return t2
-    else error "app: type of argument incorrect" 
-  | Letrec(id,param,tParam,tRes,body,target) ->
+    else error "app: type of argument incorrect"
+  | Letrec(_id,_param,None,_,_body,_target) | Letrec(_id,_param,_,None,_body,_target) ->
+    error "letrec: type declaration missing"
+  | Letrec(id,param,Some tParam,Some tRes,body,target) ->
     extend_tenv id (FuncType(tParam,tRes)) >>+
     (extend_tenv param tParam >>+
      chk_expr body >>= fun t ->
@@ -53,22 +55,17 @@ let rec chk_expr : expr -> texpr tea_result = function
     print_endline str;
     error "Debug: reached breakpoint"
   | _ -> error "chk_expr: implement"    
-
-
-
-let parse s =
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.prog Lexer.read lexbuf in
-  ast
-
+and
+  chk_prog (AProg(_,e)) =
+  chk_expr e
 
 (* Type-check an expression *)
 let chk (e:string) : texpr result =
-  let c = e |> parse |> chk_expr
+  let c = e |> parse |> chk_prog
   in run_teac c
 
 let chkpp (e:string) : string result =
-  let c = e |> parse |> chk_expr
+  let c = e |> parse |> chk_prog
   in run_teac (c >>= fun t -> return @@ Ast.string_of_texpr t)
 
 

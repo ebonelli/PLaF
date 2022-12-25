@@ -1,16 +1,11 @@
 open Ast
 open ReM
 open Ds
-
+open Parser_main
+  
 let g_store = Store.empty_store 20 (NumVal 0)
 
-let rec apply_clos : string*Ast.expr*env -> exp_val -> exp_val ea_result =
-  fun (id,e,en) ev ->
-  return en >>+
-  extend_env id ev >>+
-  eval_expr e
-and
-  eval_expr : expr -> exp_val ea_result = fun e ->
+let rec eval_expr : expr -> exp_val ea_result = fun e ->
   match e with
   | Int(n) -> return @@ NumVal n
   | Var(id) -> apply_env id
@@ -66,17 +61,16 @@ and
     eval_expr e >>=
     pair_of_pairVal >>= fun p ->
     return @@ snd p
-  | Proc(id,e)   ->
-    lookup_env >>= fun en ->
-    return (ProcVal(id,e,en))
-  | ProcT(id,_t,e)  ->
+  | Proc(id,_,e)   ->
     lookup_env >>= fun en ->
     return (ProcVal(id,e,en))
   | App(e1,e2)  -> 
     eval_expr e1 >>= 
-    clos_of_procVal >>= fun clos ->
-    eval_expr e2 >>= 
-    apply_clos clos 
+    clos_of_procVal >>= fun (id,e,en) ->
+    eval_expr e2 >>= fun ev ->
+    return en >>+
+    extend_env id ev >>+
+    eval_expr e
   | Letrec(id,par,_targ,_ty,e,target) ->
     extend_env_rec id par e >>+
     eval_expr target 
@@ -101,16 +95,12 @@ and
     in (print_endline (str_env^"\n"^str_store);
         error "Reached breakpoint")
   | _ -> failwith ("Not implemented: "^string_of_expr e)
+and
+  eval_prog (AProg(_,e)) =
+  eval_expr e   
 
-(** [parse s] parses string [s] into an ast *)
-let parse (s:string) : expr =
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.prog Lexer.read lexbuf in
-  ast
-
-
-(** [interp s] parses [s] and then evaluates it *)
+(* Interpret an expression *)
 let interp (s:string) : exp_val result =
-  let c = s |> parse |> eval_expr
+  let c = s |> parse |> eval_prog
   in run c
 

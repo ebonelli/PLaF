@@ -4,6 +4,7 @@ open Checked.ReM;;
 open Checked.Ast;;
 open Checked.Interp;;
 open Checked.Ds;;
+open Checked.Parser_main;;
 (* Added by OPAM. *)
 let () =
   try Topdirs.dir_directory (Sys.getenv "OCAML_TOPLEVEL_PATH")
