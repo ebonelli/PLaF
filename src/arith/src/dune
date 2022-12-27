@@ -4,7 +4,7 @@
 
 (menhir
  (modules parser)
- (flags -lg 1 -la 1 -lc 2 --dump)
+;; (flags -lg 1 -la 1 -lc 2 --dump)
 )
 
 (library

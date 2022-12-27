@@ -29,6 +29,8 @@ open Ast
 %token RPAREN
 %token LBRACE
 %token RBRACE
+%token LANGLE
+%token RANGLE
 %token ABS
 %token LET
 %token EQUALS
@@ -51,6 +53,7 @@ open Ast
 %token SND
 %token PAIR
 %token UNPAIR
+%token UNTUPLE
 %token DEBUG
 %token SEND
 %token CLASS
@@ -102,7 +105,7 @@ open Ast
    the starting point is for parsing the language.  The following
    declaration says to start with a rule (defined below) named [prog].
    The declaration also says that parsing a [prog] will return an OCaml
-   value of type [Ast.expr]. *)
+   value of type [Ast.prog]. *)
 
 %start <Ast.prog> prog
 
@@ -129,40 +132,16 @@ open Ast
     that value in its action.  This is perhaps best understood by example... *)
 
 
-(* The first rule, named [prog], has just a single production.  It says
-   that a [prog] is an [expr] followed by [EOF] (which stands for end-of-file).
+(** The first rule, named [prog], has just a single production.  It says
+   that a [prog] is a (possibly empty) list [cls] of class declarations
+   followed by the "main" expression [e] and followed by [EOF] (which stands for end-of-file).
    EOF is a token returned by the lexer when it reaches the end of the token stream.
-   The first part of the production, [e=expr], says to match an [expr] and bind
-   the resulting value to [e].  The action simply says to return that value [e]. *)
+   The action says to return value [AProg(cls,e)]. *)
 
 prog:
-	| cls = list(iface_or_class_decl); e = expr; EOF { AProg(cls,e) }
-	;
+ | cls = list(iface_or_class_decl); e = expr; EOF { AProg(cls,e) }
 
-(* The second rule, named [expr], has productions for integers, variables,
-   addition expressions, let expressions, and parenthesized expressions.
-
-   - The first production, [i = INT], says to match an [INT] token, bind the
-     resulting OCaml [int] value to [i], and return AST node [Int i].
-
-   - The second production, [x = ID], says to match an [ID] token, bind the
-     resulting OCaml [string] value to [x], and return AST node [Var x].
-
-   - The third production, [e1 = expr; PLUS; e2 = expr], says to match
-     an [expr] followed by a [PLUS] token followed by another [expr].
-     The first [expr] is bound to [e1] and the second to [e2].  The AST
-     node returned is [Add(e1,e2)].
-
-   - The fourth production, [LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr],
-     says to match a [LET] token followed by an [ID] token followed by
-     an [EQUALS] token followed by an [expr] followed by an [IN] token
-     followed by another [expr].  The string carried by the [ID] is bound
-     to [x], and the two expressions are bound to [e1] and [e2].  The AST
-     node returned is [Let(x,e1,e2)].
-
-   - The fifth production, [LPAREN; e = expr; RPAREN] says to match an
-     [LPAREN] token followed by an [expr] followed by an [RPAREN].  The
-     expression is bound to [e] and returned. *)
+(* The remaining rules address expressions and class declarations. *)
 
 expr:
 | i = INT { Int i }
@@ -177,14 +156,10 @@ expr:
 | FST; LPAREN; e=expr; RPAREN { Fst(e) }
 | SND; LPAREN; e=expr; RPAREN { Snd(e) }
 | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
-| LETREC; x = ID; LPAREN; y = ID; RPAREN; EQUALS; e1 = expr; IN;
-  e2 = expr { Letrec(x,y,None,None,e1,e2) }
-| LETREC; x = ID; LPAREN; y = ID; COLON; targ=texpr; RPAREN; COLON
-  ; tres=texpr; EQUALS; e1 = expr; IN;
-  e2 = expr { Letrec(x,y,Some targ,Some tres,e1,e2) }
-| PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,None,e) }
-| PROC; LPAREN; x = ID; COLON; t=texpr; RPAREN; LBRACE; e = expr;
-  RBRACE { Proc(x,Some t,e) }
+| LETREC; x = ID; LPAREN; y = ID; targ=option(type_annotation); RPAREN; tres=option(type_annotation); EQUALS; e1 = expr; IN;
+  e2 = expr { Letrec(x,y,targ,tres,e1,e2) }
+| PROC; LPAREN; x = ID; t = option(type_annotation); RPAREN; LBRACE; e = expr;
+  RBRACE { Proc(x,t,e) }
 | LPAREN; e1 = expr; e2 = expr; RPAREN { App(e1,e2) }
 | ISZERO; LPAREN; e = expr; RPAREN { IsZero(e) }
 | NEWREF; LPAREN; e = expr; RPAREN { NewRef(e) }
@@ -192,7 +167,7 @@ expr:
 | SETREF; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { SetRef(e1,e2) }
 | IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { ITE(e1,e2,e3) }
 | SET; x = ID; EQUALS; e = expr { Set(x,e) }
-| BEGIN; es = exprs; END { BeginEnd(es) }
+| BEGIN; es = separated_list(SEMICOLON, expr); END { BeginEnd(es) }
 | LPAREN; e = expr; RPAREN {e}
   (*    | MINUS e = expr %prec UMINUS { SubExp(IntExp 0,e) }*)
 | LPAREN; MINUS e = expr; RPAREN  { Sub(Int 0, e) }
@@ -200,6 +175,9 @@ expr:
 | LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Pair(e1,e2) }
 | UNPAIR; LPAREN; x = ID; COMMA; y=ID; RPAREN; EQUALS; e1 = expr;
   IN; e2 = expr { Unpair(x,y,e1,e2) }
+| LANGLE; es = separated_list(COMMA, expr) ; RANGLE { Tuple(es) }
+| UNTUPLE; LANGLE; is = separated_list(COMMA, ID) ;RANGLE; EQUALS; e1 = expr; IN;
+      e2 = expr { Untuple(is,e1,e2) }
 | LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
 | e1=expr; DOT; id=ID { Proj(e1,id) }
 | NEW; id=ID; LPAREN; args = separated_list(COMMA, expr);
@@ -216,27 +194,26 @@ expr:
 | CONS; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Cons(e1,e2) }
 | INSTANCEOF LPAREN; e=expr; COMMA; id=ID; RPAREN { IsInstanceOf(e,id) }
 | CAST; LPAREN; e1=expr; COMMA; id=ID; RPAREN { Cast(e1,id) }
-    
-      
+
+type_annotation:
+| COLON; t=texpr { t } 
+
 field:
 | id = ID; EQUALS; e=expr { (id,e) }
     
 fieldtype:
 | id = ID; COLON; t=texpr { (id,t) }
-    
-exprs:
-| es = separated_list(SEMICOLON, expr)    { es }
       
 iface_or_class_decl:
-| CLASS; id1=ID; EXTENDS; id2=ID; LBRACE; ofs = list(obj_fields);
-      mths = list(method_decl); RBRACE
-      { Class(id1,id2,None,ofs,mths)}
-| CLASS; id1=ID; EXTENDS; id2=ID; IMPLEMENTS; id3=ID; LBRACE; ofs = list(obj_fields);
-      mths = list(method_decl);
-      RBRACE { Class(id1,id2,Some id3,ofs,mths)}
-| INTERFACE; id=ID; LBRACE; amths = list(abstract_method_decl);
-      RBRACE { Interface(id,amths)}
-      
+| CLASS; id1=ID; EXTENDS; id2=ID; id3=option(implements_declaration);
+  LBRACE; ofs = list(obj_fields); mths = list(method_decl); RBRACE
+  { Class(id1,id2,id3,ofs,mths)}
+| INTERFACE; id=ID; LBRACE; amths = list(abstract_method_decl); RBRACE
+  { Interface(id,amths)}
+
+implements_declaration:
+| IMPLEMENTS; id=ID { id }
+
 obj_fields:
 | FIELD; id=ID { (id,None) }
 | FIELD; t=texpr; id=ID { (id,Some t) }
@@ -256,12 +233,11 @@ abstract_method_decl:
          { MethodAbs(id,retType,params) }
                   
 formal_par:
-| id=ID;  { (id,None) }
-| id=ID; COLON; t=texpr { (id,Some t) }
+| id=ID; t = option(type_annotation) { (id, t) }
                   
 texpr:
 | id=ID { UserType(id) }
-| "int" { IntType }
+| "int" { IntType } (* tried testing the use of token aliases *)
 | "bool" { BoolType }
 | "unit" { UnitType }
 | t1 = texpr; "->"; t2 = texpr { FuncType(t1,t2) }

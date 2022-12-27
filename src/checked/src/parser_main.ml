@@ -7,28 +7,23 @@ module L = MenhirLib.LexerUtil
 type parse_result = Succ of prog | LexErr of string | ParseErr of string
 
 let firstPass s : parse_result =
-
   (* Read the file; allocate and initialize a lexing buffer. *)
   let lexbuf = Lexing.from_string s in
   (* Run the parser. *)
   match Parser.prog Lexer.read lexbuf with
-
   | v ->
     (* Success. The parser has produced an expression [v]. *)
     Succ v
-
   | exception Lexer.Error msg ->
     (* A lexical error has occurred. *)
     let _ = print_endline "Lexical Error Encountered" in
     let _ = eprintf "%s%!" msg in
     LexErr "Lexing error above"
-
   | exception Parser.Error ->
     (* A syntax error has occurred. *)
     ParseErr s
 
 (* -------------------------------------------------------------------------- *)
-
 (* This part concerns the table-based parser [UnitActionsParser]. *)
 
 module I = UnitActionsParser.MenhirInterpreter
@@ -121,35 +116,26 @@ let secondPass s : string =
 
 (* Top level parser *)
 
-(* Parse and interpret an expression read from a file *)
-
 let read_file (filename:string) : string = 
   let lines = ref [] in
   let chan = open_in filename in
   try
     while true do
-      lines := (input_line chan) :: !lines (* puts the newline back; separator *)
+      lines := (input_line chan) :: !lines 
     done;
     "" (* never reaches this line *)
   with End_of_file ->
     close_in chan;
     String.concat "\n" (List.rev !lines)
 
-let add_sool_extension s =
-  let s = String.trim s      (* remove leading and trailing spaces *)
-  in match String.index_opt s '.' with (* allow extension to be optional *)
-  | None -> s^".sool"
-  | _ -> s  
-
 (** [parse s] parses string [s] into an ast 
-    AND prints useful errors if any are present *)
+    and prints useful errors if any are present *)
 let parse (s:string): prog =
   match firstPass s with
     | Succ prog -> prog
     | LexErr msg -> failwith msg
     | ParseErr s -> failwith (secondPass s)
 
-(** [parsef s] parses [s] with useful parsing errors
-    if they are present, or evaluates if they aren't *)
-let parsef (s: string) : prog = 
-  add_sool_extension s |> read_file |> parse
+(** [parsef sfile_name] parses string in file [file_name] *)
+let parsef (file_name: string) : prog = 
+  file_name |> read_file |> parse

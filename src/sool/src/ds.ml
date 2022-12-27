@@ -154,3 +154,8 @@ let string_of_env : string ea_result =
   fun env ->
   Ok ("Environment:\n"^ string_of_env' env)
 
+let add_sool_extension s =
+  let s = String.trim s      (* remove leading and trailing spaces *)
+  in match String.index_opt s '.' with (* allow extension to be optional *)
+  | None -> s^".sool"
+  | _ -> s  
