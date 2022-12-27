@@ -105,13 +105,6 @@ let string_of_stringVal : exp_val -> string ea_result =  function
   | StringVal s -> return s
   | _ -> error "Expected a string!"
 
-
-let rec string_of_list_of_strings = function
-  | [] -> ""
-  | [id] -> id
-  | id::ids -> id ^ "," ^ string_of_list_of_strings ids
-
-
 let int_of_refVal =  function
   |  RefVal n -> return n
   | _ -> error "Expected a reference!"
@@ -129,33 +122,37 @@ let obj_of_objectVal =  function
 let rec string_of_expval = function
   |  NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
-  | ProcVal (id,body,env) -> "ProcVal ("^id^","^Ast.string_of_expr
-                               body^","^ string_of_env' env^")"
+  | ProcVal (id,body,env) -> "ProcVal ("^ id ^","^Ast.string_of_expr
+                               body^","^ string_of_env' []
+                                             env^")"
   | PairVal(v1,v2) -> "PairVal("^string_of_expval
                         v1^","^string_of_expval v2^")"
-  | TupleVal(evs) ->  "Tuple (" ^ string_of_list_of_strings (List.map
+  | TupleVal(evs) ->  "Tuple (" ^ String.concat "," (List.map
                                                    string_of_expval
-                                                   evs)  ^ ")" 
-  | UnitVal -> "UnitVal " 
+                                                   evs)  ^ ")"   | UnitVal -> "UnitVal " 
   | RefVal i -> "RefVal ("^string_of_int i^")"
-  | ObjectVal(id,env) -> "ObjectVal("^id ^","^string_of_env' env^")"
+  | ObjectVal(id,env) -> "ObjectVal("^id ^","^string_of_env' [] env^")"
   | StringVal s -> "StringVal " ^ s
-  | ListVal(evs) ->  "ListVal (" ^ string_of_list_of_strings (List.map
+  | ListVal(evs) ->  "ListVal (" ^String.concat "," (List.map
                                                    string_of_expval
                                                    evs)  ^ ")" 
   | _ -> failwith "string_of_expval: not implemented"
 and
-  string_of_env'  = function
-  | EmptyEnv -> ""
-  | ExtendEnv(id,v,env) -> "("^id^","^string_of_expval v^")"^string_of_env' env
-  | ExtendEnvRec(id,param,body,env) -> "("^id^","^param^","^Ast.string_of_expr body^")"^string_of_env' env
-
+   string_of_env' ac = function
+  | EmptyEnv ->  "["^String.concat ",\n" ac^"]"
+  | ExtendEnv(id,v,env) -> string_of_env' ((id^":="^string_of_expval v)::ac) env
+  | ExtendEnvRec(id,param,body,env) -> string_of_env'
+                                         ((id^":=Rec("^param^","^Ast.string_of_expr body^")")::ac) env
+                                         
 let string_of_env : string ea_result =
   fun env ->
-  Ok ("Environment:\n"^ string_of_env' env)
+  match env with
+  | EmptyEnv -> Ok ">>Environment:\nEmpty"
+  | _ -> Ok (">>Environment:\n"^ string_of_env' [] env)
 
 let add_sool_extension s =
   let s = String.trim s      (* remove leading and trailing spaces *)
   in match String.index_opt s '.' with (* allow extension to be optional *)
   | None -> s^".sool"
   | _ -> s  
+

@@ -104,23 +104,18 @@ let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
   | ProcVal(id,body,en) -> return (id,body,en)
   | _ -> error "Expected a closure!"
 
-let rec string_of_list_of_strings = function
-  | [] -> ""
-  | [id] -> id
-  | id::ids -> id ^ "," ^ string_of_list_of_strings ids
-
 let rec string_of_expval = function
   |  NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
   | UnitVal -> "UnitVal "
   | ProcVal (id,body,env) -> "ProcVal ("^ id ^","^Ast.string_of_expr
-                               body^","^ String.concat ",\n"
-                               (string_of_env' [] env)^")"
+                               body^","^ string_of_env' []
+                                             env^")"
   | PairVal(v1,v2) -> "PairVal("^string_of_expval
                         v1^","^string_of_expval v2^")"
 and
    string_of_env' ac = function
-  | EmptyEnv -> ac
+  | EmptyEnv ->  "["^String.concat ",\n" ac^"]"
   | ExtendEnv(id,v,env) -> string_of_env' ((id^":="^string_of_expval v)::ac) env
   | ExtendEnvRec(id,param,body,env) -> string_of_env'
   ((id^":=Rec("^param^","^Ast.string_of_expr body^")")::ac) env
@@ -129,4 +124,5 @@ let string_of_env : string ea_result =
   fun env ->
   match env with
   | EmptyEnv -> Ok ">>Environment:\nEmpty"
-  | _ -> Ok (">>Environment:\n"^ String.concat ",\n" (string_of_env' [] env))
+  | _ -> Ok (">>Environment:\n"^ string_of_env' [] env)
+

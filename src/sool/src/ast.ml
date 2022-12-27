@@ -26,6 +26,7 @@ and
   | Fst of expr
   | Snd of expr
   | Tuple of expr list
+  | Untuple of string list * expr*expr               
   | Pair of expr*expr
   | Unpair of string*string*expr*expr
   | Record of (string*expr) list
@@ -92,7 +93,11 @@ let rec string_of_expr e =
   | Fst(e) -> "Fst("^string_of_expr e^")"
   | Snd(e) -> "Snd("^string_of_expr e^")"
   | Pair(e1,e2) -> "Pair(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
-  | Unpair(x,y,e1,e2) -> "Unpair("^x^","^y^","^string_of_expr e1 ^","^ string_of_expr e2 ^")"
+  | Unpair(x,y,e1,e2) -> "Unpair("^x^","^y^","^string_of_expr e1 ^","^
+                         string_of_expr e2 ^")"
+  | Tuple(es) -> "<" ^ String.concat "," (List.map string_of_expr es) ^">"
+  | Untuple(ids,e1,e2) -> "untuple <"^ String.concat "," ids ^ ">="^
+                                                   string_of_expr e1 ^" in "^string_of_expr e2
   | Super(id,es) -> "Super("^id^","^String.concat "," (List.map string_of_expr es)^")"
   | Self -> "Self"
   | NewObject(id,es) -> "NewObj("^id^",["^String.concat "," (List.map string_of_expr es)^"])"
