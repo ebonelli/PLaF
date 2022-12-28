@@ -1,6 +1,6 @@
 open Parser_plaf.Ast
-open Ds
 open Parser_plaf.Parser
+open Ds
     
 (** [eval_expr e] evaluates expression [e] 
     [eval_prog e] evaluates program [e] *)

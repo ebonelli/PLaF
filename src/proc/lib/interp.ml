@@ -1,9 +1,7 @@
-open Ast
+open Parser_plaf.Ast
+open Parser_plaf.Parser
 open Ds
-open Parser_main
-    
-(** [eval_expr e] evaluates expression [e] 
-    [eval_prog e] evaluates program [e] *)
+
 let rec eval_expr : expr -> exp_val ea_result =
   fun e ->
   match e with
@@ -37,9 +35,9 @@ let rec eval_expr : expr -> exp_val ea_result =
     if n2==0
     then error "Division by zero"
     else return (NumVal (n1/n2))
-  | Let(id,def,body) ->
+  | Let(v,def,body) ->
     eval_expr def >>= 
-    extend_env id >>+
+    extend_env v >>+
     eval_expr body 
   | ITE(e1,e2,e3) ->
     eval_expr e1 >>=
@@ -51,22 +49,28 @@ let rec eval_expr : expr -> exp_val ea_result =
     eval_expr e >>=
     int_of_numVal >>= fun n ->
     return (BoolVal (n = 0))
-  | Tuple(es) ->
-    sequence (List.map eval_expr es) >>= fun evs ->
-    return (TupleVal evs)
-  | Untuple(ids,e1,e2) ->
-    eval_expr e1 >>=
-    list_of_tupleVal >>= fun evs ->
-    if List.length ids<>List.length evs
-         then error "untuple: mismatch"
-         else extend_env_list ids evs >>+
-           eval_expr e2
-  | Record(fs) ->
-    let (ids,es) = List.split fs
-    in 
-      failwith "implement"
-  | Proj(e,id) ->
-      failwith "implement"
+  | Pair(e1,e2) ->
+    eval_expr e1 >>= fun ev1 ->
+    eval_expr e2 >>= fun ev2 ->
+    return (PairVal(ev1,ev2))
+  | Fst(e) ->
+    eval_expr e >>=
+    pair_of_pairVal >>= fun p ->
+    return (fst p) 
+  | Snd(e) ->
+    eval_expr e >>=
+    pair_of_pairVal >>= fun p ->
+    return (snd p)
+  | Proc(id,_,e)  ->
+    lookup_env >>= fun en ->
+    return (ProcVal(id,e,en))
+  | App(e1,e2)  -> 
+    eval_expr e1 >>= 
+    clos_of_procVal >>= fun (id,e,en) ->
+    eval_expr e2 >>= fun ev ->
+    return en >>+
+    extend_env id ev >>+
+    eval_expr e
   | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
@@ -78,9 +82,10 @@ and
 
 
 (** [interp s] parses [s] and then evaluates it *)
-let interp (e:string) : exp_val result =
-  let c = e |> parse |> eval_prog
+let interp (s:string) : exp_val result =
+  let c = s |> parse |> eval_prog
   in run c
-  
+
+
 
 

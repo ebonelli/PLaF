@@ -8,11 +8,11 @@
 (source
  (github username/reponame))
 
-(authors "Author Name")
+(authors "Eduardo Bonelli")
 
 (maintainers "Maintainer Name")
 
-(license LICENSE)
+(license Apache-2.0)
 
 (documentation https://url/to/documentation)
 
