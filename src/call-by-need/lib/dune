@@ -1,0 +1,19 @@
+
+
+
+(library
+ (name cbneed)        ; name of the opam library
+ (libraries parser_plaf)
+ (public_name cbneed) ; required for generating documentation
+                    ; also requires sool.opam in root of workspace
+ (synopsis "Interpreter for CBNEED")
+ ;; (wrapped      false) ; true by default
+ )
+
+; the next line avoids warnings from stopping the build
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A))))
+

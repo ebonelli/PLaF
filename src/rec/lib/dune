@@ -2,10 +2,10 @@
 
 
 (library
- (name let)        ; name of the opam library
+ (name rec)        ; name of the opam library
  (libraries parser_plaf)
- (public_name let) ; required for generating documentation
- (synopsis "Interpreter for LET")
+ (public_name rec) ; required for generating documentation
+ (synopsis "Interpreter for REC")
  ;; (wrapped      false) ; true by default
  )
 

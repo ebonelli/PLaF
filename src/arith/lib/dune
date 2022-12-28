@@ -1,0 +1,19 @@
+
+
+
+(library
+ (name arith)        ; name of the opam library
+ (libraries parser_plaf)
+ (public_name arith) ; required for generating documentation
+                    ; also requires sool.opam in root of workspace
+ (synopsis "Interpreter for ARITH")
+ ;; (wrapped      false) ; true by default
+ )
+
+; the next line avoids warnings from stopping the build
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A))))
+
