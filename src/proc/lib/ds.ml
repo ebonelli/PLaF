@@ -1,4 +1,5 @@
 (* This file defines expressed values and environments *)
+open Parser_plaf.Ast
 
 
 (* expressed values and environments are defined mutually recursively *)
@@ -7,7 +8,7 @@ type exp_val =
   | NumVal of int
   | BoolVal of bool
   | PairVal of exp_val*exp_val
-  | ProcVal of string*Ast.expr*env
+  | ProcVal of string*expr*env
 and
   env =
   | EmptyEnv
@@ -87,7 +88,7 @@ let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result = function
   | PairVal(v1,v2) -> return (v1,v2)
   | _ -> error "Expected a pair!"
 
-let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+let clos_of_procVal : exp_val -> (string*expr*env) ea_result =
   fun ev ->
   match ev with
   | ProcVal(id,body,en) -> return (id,body,en)
@@ -102,7 +103,7 @@ let rec string_of_list_of_strings = function
 let rec string_of_expval = function
   |  NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
-  | ProcVal (id,body,env) -> "ProcVal ("^ id ^","^Ast.string_of_expr
+  | ProcVal (id,body,env) -> "ProcVal ("^ id ^","^string_of_expr
                                body^","^ string_of_env' []
                                              env^")"
   | PairVal(v1,v2) -> "PairVal("^string_of_expval
