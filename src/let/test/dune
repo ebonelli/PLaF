@@ -1,10 +1,2 @@
-
-
-
 (test
-(name test)
-(libraries ounit2 let))
-
-(env
-  (dev
-(flags (:standard -warn-error -A))))
+ (name let))

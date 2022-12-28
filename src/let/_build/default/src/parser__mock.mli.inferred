@@ -1,0 +1,102 @@
+type token =
+    UNTUPLE
+  | UNPAIR
+  | UNITTYPE
+  | TL
+  | TIMES
+  | THEN
+  | SUPER
+  | SND
+  | SETREF
+  | SET
+  | SEND
+  | SEMICOLON
+  | SELF
+  | RPAREN
+  | REFTYPE
+  | RBRACE
+  | RANGLE
+  | PROC
+  | PLUS
+  | PAIR
+  | NEWREF
+  | NEW
+  | MINUS
+  | METHOD
+  | LPAREN
+  | LIST
+  | LETREC
+  | LET
+  | LBRACE
+  | LANGLE
+  | ISZERO
+  | INTTYPE
+  | INTERFACE
+  | INT of int
+  | INSTANCEOF
+  | IN
+  | IMPLEMENTS
+  | IF
+  | ID of string
+  | HD
+  | FST
+  | FIELD
+  | EXTENDS
+  | EQUALS
+  | EOF
+  | END
+  | EMPTYPRED
+  | ELSE
+  | DOT
+  | DIVIDED
+  | DEREF
+  | DEBUG
+  | CONS
+  | COMMA
+  | COLON
+  | CLASS
+  | CAST
+  | BOOLTYPE
+  | BEGIN
+  | ARROW
+  | ABS
+val menhir_begin_marker : int
+val xv_texpr : Ast.texpr
+val xv_separated_nonempty_list_SEMICOLON_fieldtype_ :
+  (string * Ast.texpr) list
+val xv_separated_nonempty_list_SEMICOLON_field_ : (string * Ast.expr) list
+val xv_separated_nonempty_list_SEMICOLON_expr_ : Ast.expr list
+val xv_separated_nonempty_list_COMMA_formal_par_ :
+  (string * Ast.texpr option) list
+val xv_separated_nonempty_list_COMMA_expr_ : Ast.expr list
+val xv_separated_nonempty_list_COMMA_ID_ : string list
+val xv_separated_list_SEMICOLON_fieldtype_ : (string * Ast.texpr) list
+val xv_separated_list_SEMICOLON_field_ : (string * Ast.expr) list
+val xv_separated_list_SEMICOLON_expr_ : Ast.expr list
+val xv_separated_list_COMMA_formal_par_ : (string * Ast.texpr option) list
+val xv_separated_list_COMMA_expr_ : Ast.expr list
+val xv_separated_list_COMMA_ID_ : string list
+val xv_prog : Ast.prog
+val xv_obj_fields : string * Ast.texpr option
+val xv_method_decl : Ast.mdecl
+val xv_loption_separated_nonempty_list_SEMICOLON_fieldtype__ :
+  (string * Ast.texpr) list
+val xv_loption_separated_nonempty_list_SEMICOLON_field__ :
+  (string * Ast.expr) list
+val xv_loption_separated_nonempty_list_SEMICOLON_expr__ : Ast.expr list
+val xv_loption_separated_nonempty_list_COMMA_formal_par__ :
+  (string * Ast.texpr option) list
+val xv_loption_separated_nonempty_list_COMMA_expr__ : Ast.expr list
+val xv_loption_separated_nonempty_list_COMMA_ID__ : string list
+val xv_list_obj_fields_ : (string * Ast.texpr option) list
+val xv_list_method_decl_ : Ast.mdecl list
+val xv_list_iface_or_class_decl_ : Ast.cdecl list
+val xv_list_abstract_method_decl_ : Ast.abs_mdecl list
+val xv_iface_or_class_decl : Ast.cdecl
+val xv_formal_par : string * Ast.texpr option
+val xv_fieldtype : string * Ast.texpr
+val xv_field : string * Ast.expr
+val xv_exprs : Ast.expr list
+val xv_expr : Ast.expr
+val xv_abstract_method_decl : Ast.abs_mdecl
+val menhir_end_marker : int
