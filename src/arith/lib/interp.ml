@@ -29,10 +29,10 @@ let rec eval_expr : expr -> int result =
     eval_expr e >>= fun n ->
     return (abs n)
   | _ -> failwith "Not implemented yet!"
-and
-  eval_prog (AProg(_,e)) =
-  eval_expr e
 
+(** [eval_prog e] evaluates program [e] *)
+let eval_prog (AProg(_,e)) =
+  eval_expr e
 
 (** [interp s] parses [s] and then evaluates it *)
 let interp (e:string) : int result =

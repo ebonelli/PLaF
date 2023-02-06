@@ -76,8 +76,8 @@ let rec eval_expr : expr -> exp_val ea_result =
     print_endline str; 
     error "Debug called"
   | _ -> failwith "Not implemented yet!"
-and
-  eval_prog (AProg(_,e)) =
+
+let eval_prog (AProg(_,e)) =
   eval_expr e
 
 

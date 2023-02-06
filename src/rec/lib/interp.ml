@@ -82,8 +82,8 @@ and
     print_endline str; 
     error "Debug called"
   | _ -> failwith "Not implemented yet!"
-and
-  eval_prog (AProg(_,e)) =
+
+let eval_prog (AProg(_,e)) =
   eval_expr e    
 
 (** [interp s] parses [s] and then evaluates it *)

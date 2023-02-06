@@ -100,8 +100,8 @@ and
     in (print_endline (str_env^"\n"^str_store);
     error "Reached breakpoint")
   | _ -> failwith ("Not implemented: "^string_of_expr e)
-and
-  eval_prog (AProg(_,e)) =
+
+let eval_prog (AProg(_,e)) =
   eval_expr e   
 
 (* Interpret an expression *)
