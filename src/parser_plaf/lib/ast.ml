@@ -11,6 +11,7 @@ and
   | Mul of expr*expr
   | Div of expr*expr
   | Abs of expr
+  | Min of expr*expr
   | Let of string*expr*expr
   | IsZero of expr
   | ITE of expr*expr*expr
@@ -75,6 +76,7 @@ let rec string_of_expr e =
   | Div(e1,e2) -> "Div(" ^ (string_of_expr e1) ^ "," ^ string_of_expr
                     e2 ^ ")"
   | Abs(e) -> "Abs("^string_of_expr e^")"
+  | Min(e1,e2) -> "Div(" ^ (string_of_expr e1) ^ "," ^ string_of_expr  e2 ^ ")"
   | Tuple(es) -> "<" ^ String.concat "," (List.map string_of_expr es) ^">"
   | Untuple(ids,e1,e2) -> "untuple <"^ String.concat "," ids ^ ">="^
                           string_of_expr e1 ^" in "^string_of_expr e2
