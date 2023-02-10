@@ -55,6 +55,7 @@ rule read =
   | ","      { COMMA }
   | "."      { DOT }
   | "abs"    { ABS }
+  | "min"    { MIN }
   | "let"    { LET }
   | "="      { EQUALS }
   | "in"     { IN }

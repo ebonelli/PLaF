@@ -2,8 +2,7 @@ open Parser_plaf.Ast
 open Parser_plaf.Parser
 open Ds
     
-(** [eval_expr e] evaluates expression [e] 
-    [eval_prog e] evaluates program [e] *)
+(** [eval_expr e] evaluates expression [e] *)
 let rec eval_expr : expr -> exp_val ea_result =
   fun e ->
   match e with
@@ -66,8 +65,9 @@ let rec eval_expr : expr -> exp_val ea_result =
     print_endline str; 
     error "Debug called"
   | _ -> failwith "Not implemented yet!"
-and
-  eval_prog (AProg(_,e)) =
+
+(** [eval_prog e] evaluates program [e] *)
+let eval_prog (AProg(_,e)) =
   eval_expr e
 
 

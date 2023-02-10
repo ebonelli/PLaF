@@ -32,6 +32,7 @@ open Ast
 %token LANGLE
 %token RANGLE
 %token ABS
+%token MIN
 %token LET
 %token EQUALS
 %token IN
@@ -152,6 +153,7 @@ expr:
 | e1 = expr; TIMES; e2 = expr { Mul(e1,e2) }
 | e1 = expr; DIVIDED; e2 = expr { Div(e1,e2) }
 | ABS; LPAREN; e=expr; RPAREN { Abs(e) }
+| MIN; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Min(e1,e2) }
 | PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
 | FST; LPAREN; e=expr; RPAREN { Fst(e) }
 | SND; LPAREN; e=expr; RPAREN { Snd(e) }
