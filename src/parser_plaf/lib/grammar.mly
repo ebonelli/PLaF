@@ -1,23 +1,16 @@
-(* The first section of the grammar definition, called the *header*,
-   is the part that appears below between %{ and %}.  It is code
-   that will simply be copied literally into the generated parser.ml.
-   Here we use it just to open the Ast module so that, later on
-   in the grammar definition, we can write expressions like
-   [Int i] instead of [Ast.Int i]. *)
+(* Grammar
+   E.B.
+ *)
+
+(* Header:
+   Contents copied verbatim to output file  
+ *)
 
 %{
 open Ast
 %}
 
-(* The next section of the grammar definition, called the *declarations*,
-   first declares all the lexical *tokens* of the language.  These are
-   all the kinds of tokens we can expect to read from the token stream.
-   Note that each of these is just a descriptive name---nothing so far
-   says that LPAREN really corresponds to '(', for example.  The tokens
-   that have a <type> annotation appearing in them are declaring that
-   they will carry some additional data along with them.  In the
-   case of INT, that's an OCaml int.  In the case of ID, that's
-   an OCaml string. *)
+(* Tokens *)
 
 %token <int> INT
 %token <string> ID
@@ -33,6 +26,10 @@ open Ast
 %token RANGLE
 %token ABS
 %token MIN
+%token SUM 
+%token PROD 
+%token AVG 
+%token MAXL 
 %token LET
 %token EQUALS
 %token IN
@@ -82,16 +79,7 @@ open Ast
 %token REFTYPE "ref"
 %token EOF
 
-(* After declaring the tokens, we have to provide some additional information
-   about precedence and associativity.  The following declarations say that
-   PLUS is left associative, that IN is not associative, and that PLUS
-   has higher precedence than IN (because PLUS appears on a line after IN).
-
-   Because PLUS is left associative, "1+2+3" will parse as "(1+2)+3"
-   and not as "1+(2+3)".
-
-   Because PLUS has higher precedence than IN, "let x=1 in x+2" will
-   parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
+(* Precedence and associativity *)
 
 %nonassoc IN ELSE EQUALS            /* lowest precedence */
 %right ARROW
@@ -102,11 +90,7 @@ open Ast
                           (*%nonassoc UMINUS        /* highest precedence */*)
 
 
-(* After declaring associativity and precedence, we need to declare what
-   the starting point is for parsing the language.  The following
-   declaration says to start with a rule (defined below) named [prog].
-   The declaration also says that parsing a [prog] will return an OCaml
-   value of type [Ast.prog]. *)
+(* Start symbol of the grammar *)
 
 %start <Ast.prog> prog
 
@@ -114,29 +98,10 @@ open Ast
 
 %%
 
-(* Now begins the *rules* section of the grammar definition.  This is a list
-   of rules that are essentially in Backus-Naur Form (BNF), although where in
-   BNF we would write "::=" these rules simply write ":".
-
-   The format of a rule is
-
-     name:
-       | production { action }
-       | production { action }
-       | etc.
-       ;
-
-    The *production* is the sequence of *symbols* that the rule matches.
-    A symbol is either a token or the name of another rule.
-    The *action* is the OCaml value to return if a match occurs.
-    Each production can *bind* the value carried by a symbol and use
-    that value in its action.  This is perhaps best understood by example... *)
+(* Productions of the grammar (called "rules" in Menhir) *)
 
 
-(** The first rule, named [prog], has just a single production.  It says
-   that a [prog] is a (possibly empty) list [cls] of class declarations
-   followed by the "main" expression [e] and followed by [EOF] (which stands for end-of-file).
-   EOF is a token returned by the lexer when it reaches the end of the token stream.
+(** EOF is a token returned by the lexer when it reaches the end of the token stream.
    The action says to return value [AProg(cls,e)]. *)
 
 prog:
@@ -154,6 +119,10 @@ expr:
 | e1 = expr; DIVIDED; e2 = expr { Div(e1,e2) }
 | ABS; LPAREN; e=expr; RPAREN { Abs(e) }
 | MIN; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Min(e1,e2) }
+| SUM; LPAREN;es = separated_list(COMMA, expr); RPAREN { Sum(es) }
+| PROD; LPAREN;es = separated_list(COMMA, expr); RPAREN { Prod(es) }
+| AVG; LPAREN;es = separated_list(COMMA, expr); RPAREN { Avg(es) }
+| MAXL; LPAREN;es = separated_list(COMMA, expr); RPAREN { Maxl(es) }
 | PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
 | FST; LPAREN; e=expr; RPAREN { Fst(e) }
 | SND; LPAREN; e=expr; RPAREN { Snd(e) }
