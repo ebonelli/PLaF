@@ -34,12 +34,16 @@ and
   | Untuple of string list * expr*expr               
   | Pair of expr*expr
   | Unpair of string*string*expr*expr
+  | EmptyTree
+  | Node of expr*expr*expr
+  | CaseT of expr*expr*string*string*string*expr
   | Record of (string*expr) list
   | Proj of expr*string
   | Self
   | Send of expr*string*expr list
   | Super of string*expr list
   | NewObject of string*expr list
+  | EmptyList
   | Cons of expr*expr
   | Hd of expr
   | Tl of expr 
@@ -107,7 +111,17 @@ let rec string_of_expr e =
   | Fst(e) -> "Fst("^string_of_expr e^")"
   | Snd(e) -> "Snd("^string_of_expr e^")"
   | Pair(e1,e2) -> "Pair(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
-  | Unpair(x,y,e1,e2) -> "Unpair("^x^","^y^","^string_of_expr e1 ^","^ string_of_expr e2 ^")"
+  | Unpair(x,y,e1,e2) -> "Unpair("^x^","^y^","^string_of_expr e1 ^","^
+                         string_of_expr e2 ^")"
+  | EmptyList -> "EmptyList"
+  | EmptyTree -> "EmptyTree"
+  | Node(e1,e2,e3) -> "Node("^string_of_expr e1^"," ^ string_of_expr
+                        e2^"," ^ string_of_expr e3  ^")"
+  |  CaseT(e1,e_empty,did,lid,rid,e_node) -> "CaseT "^string_of_expr e1^" of
+  \n { emptytree -> "^string_of_expr e_empty^",\n"^
+                                             "node("^did^","^lid^","^rid
+                                             ^") -> "^string_of_expr
+                                               e_node^"} "
   | Super(id,es) -> "Super("^id^","^String.concat "," (List.map string_of_expr es)^")"
   | Self -> "Self"
   | NewObject(id,es) -> "NewObj("^id^",["^String.concat "," (List.map string_of_expr es)^"])"

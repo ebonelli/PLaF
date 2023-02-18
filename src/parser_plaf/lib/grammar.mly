@@ -51,7 +51,12 @@ open Ast
 %token SND
 %token PAIR
 %token UNPAIR
-%token UNTUPLE
+%token EMPTYLIST
+%token EMPTYTREE 
+%token NODE 
+%token CASET 
+%token ARROW  "->"  (* token alias to aid readability *)
+%token OF
 %token DEBUG
 %token SEND
 %token CLASS
@@ -75,7 +80,6 @@ open Ast
 %token INTTYPE "int"
 %token BOOLTYPE "bool"
 %token UNITTYPE "unit"
-%token ARROW "->"  (* token alias to aid readability *)
 %token REFTYPE "ref"
 %token EOF
 
@@ -147,8 +151,13 @@ expr:
 | UNPAIR; LPAREN; x = ID; COMMA; y=ID; RPAREN; EQUALS; e1 = expr;
   IN; e2 = expr { Unpair(x,y,e1,e2) }
 | LANGLE; es = separated_list(COMMA, expr) ; RANGLE { Tuple(es) }
-| UNTUPLE; LANGLE; is = separated_list(COMMA, ID) ;RANGLE; EQUALS; e1 = expr; IN;
-      e2 = expr { Untuple(is,e1,e2) }
+| LET; LANGLE; is = separated_list(COMMA, ID) ;RANGLE; EQUALS; e1 = expr; IN;
+  e2 = expr { Untuple(is,e1,e2) }
+| EMPTYTREE { EmptyTree }
+| NODE; LPAREN; e1 = expr; COMMA; e2=expr; COMMA; e3=expr; RPAREN { Node(e1,e2,e3) }
+| CASET; e1 = expr; OF; LBRACE; EMPTYTREE; ARROW; e2=expr; COMMA;
+      NODE; LPAREN; id1 = ID; COMMA; id2=ID; COMMA; id3=ID; RPAREN;
+      ARROW;  e3=expr; RBRACE { CaseT(e1,e2,id1,id2,id3,e3) }
 | LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
 | e1=expr; DOT; id=ID { Proj(e1,id) }
 | NEW; id=ID; LPAREN; args = separated_list(COMMA, expr);
@@ -159,6 +168,7 @@ expr:
 | SUPER; id=ID; LPAREN; args = separated_list(COMMA, expr);
   RPAREN { Super(id,args) }
 | LIST; LPAREN; es= separated_list(COMMA, expr); RPAREN { List(es)}
+| EMPTYLIST { EmptyList }
 | HD; LPAREN; e = expr; RPAREN { Hd(e) }
 | TL; LPAREN; e = expr; RPAREN { Tl(e) }
 | EMPTYPRED; LPAREN; e = expr; RPAREN { IsEmpty(e) }

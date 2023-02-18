@@ -37,6 +37,8 @@ rule read =
   | ")"       { RPAREN }
   | "{"       { LBRACE }
   | "}"       { RBRACE }
+  | "<"       { LANGLE }
+  | ">"       { RANGLE }
   | ";"       { SEMICOLON }
   | ":"       { COLON }
   | ","       { COMMA }
@@ -67,6 +69,12 @@ rule read =
   | "snd"     { SND }
   | "pair"    { PAIR }
   | "unpair"  { UNPAIR }
+  | "emptylist" { EMPTYLIST }
+  | "emptytree" { EMPTYTREE }
+  | "node"      { NODE }
+  | "caseT"     { CASET }
+  | "->"        { ARROW }  
+  | "of"        { OF }
   | "send"    { SEND }
   | "class"   { CLASS }
   | "super"   { SUPER }
@@ -87,7 +95,6 @@ rule read =
   | "int"    { INTTYPE }
   | "bool"   { BOOLTYPE }
   | "unit"   { UNITTYPE }
-  | "->"     { ARROW }
   | "ref"    { REFTYPE }
   | id       { ID (Lexing.lexeme lexbuf) }
   | eof      { EOF }
