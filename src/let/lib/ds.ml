@@ -115,11 +115,11 @@ let rec string_of_expval = function
   | TupleVal evs -> "TupleVal("^String.concat "," (List.map string_of_expval evs)^")"
 
 let rec string_of_env' ac = function
-  | EmptyEnv -> ac
+  | EmptyEnv ->  "["^String.concat ",\n" ac^"]"
   | ExtendEnv(id,v,env) -> string_of_env' ((id^":="^string_of_expval v)::ac) env
 
 let string_of_env : string ea_result =
   fun env ->
   match env with
   | EmptyEnv -> Ok ">>Environment:\nEmpty"
-  | _ -> Ok (">>Environment:\n"^ String.concat ",\n" (string_of_env' [] env))
+  | _ -> Ok (">>Environment:\n"^ string_of_env' [] env)
