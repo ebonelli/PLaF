@@ -23,7 +23,7 @@ In the folder src/parser_plaf, type the following
 </code></pre>
 
 
-### Build and Run the Interpreters
+### Building and Running the Interpreters
 
 In the folder src/let/lib, type the following 
 
