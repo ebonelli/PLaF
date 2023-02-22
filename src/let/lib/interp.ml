@@ -50,16 +50,6 @@ let rec eval_expr : expr -> exp_val ea_result =
     eval_expr e >>=
     int_of_numVal >>= fun n ->
     return (BoolVal (n = 0))
-  | Tuple(es) ->
-    sequence (List.map eval_expr es) >>= fun evs ->
-    return (TupleVal evs)
-  | Untuple(ids,e1,e2) ->
-    eval_expr e1 >>=
-    list_of_tupleVal >>= fun evs ->
-    if List.length ids<>List.length evs
-         then error "untuple: mismatch"
-         else extend_env_list ids evs >>+
-           eval_expr e2
   | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
