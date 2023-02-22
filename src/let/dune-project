@@ -1,0 +1,27 @@
+(lang dune 3.2)
+(using menhir 2.0)
+
+(name let)
+
+(generate_opam_files true)
+
+(source
+ (github username/reponame))
+
+(authors "Eduardo Bonelli")
+
+(maintainers "Maintainer Name")
+
+(license Apache-2.0)
+
+(documentation https://url/to/documentation)
+
+(package
+ (name let)
+ (synopsis "A short synopsis")
+ (description "A longer description")
+ (depends ocaml dune)
+ (tags
+  (topics "to describe" your project)))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project

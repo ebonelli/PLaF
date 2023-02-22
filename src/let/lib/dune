@@ -1,0 +1,18 @@
+
+
+
+(library
+ (name let)        ; name of the opam library
+ (libraries parser_plaf)
+ (public_name let) ; required for generating documentation
+ (synopsis "Interpreter for LET")
+ ;; (wrapped      false) ; true by default
+ )
+
+; the next line avoids warnings from stopping the build
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A))))
+
