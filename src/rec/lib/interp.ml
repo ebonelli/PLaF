@@ -74,14 +74,14 @@ and
     return en >>+
     extend_env id ev >>+
     eval_expr e
-  | Letrec(id,par,_,_,e1,e2) ->
+  | Letrec([(id,par,_,_,e1)],e2) ->
     extend_env_rec id par e1 >>+
     eval_expr e2 
   | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
     error "Debug called"
-  | _ -> failwith "Not implemented yet!"
+  | _ -> failwith ("Not implemented yet!"^string_of_expr e)
 
 let eval_prog (AProg(_,e)) =
   eval_expr e    

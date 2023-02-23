@@ -21,7 +21,7 @@ and
   | ITE of expr*expr*expr
   | Proc of string*texpr option*expr
   | App of expr*expr
-  | Letrec of string*string*texpr option*texpr option*expr*expr
+  | Letrec of rdecs*expr
   | Unit
   | Set of string*expr
   | NewRef of expr
@@ -52,15 +52,17 @@ and
   | IsInstanceOf of expr*string
   | Cast of expr*string
   | Debug of expr
-and
+and (* recursive function declarations *)
+  rdecs = (string*string*texpr option*texpr option*expr) list
+and (* class declarations *)
   cdecl =
   | Class of string*string*string option*(string*texpr option) list*mdecl list
   | Interface of string*abs_mdecl list
-and
+and (* method declarations *)
   mdecl = Method of string*texpr option*(string*texpr option) list*expr
-and
+and (* abstract method declarations *)
   abs_mdecl = MethodAbs of string*texpr*(string*texpr option) list
-and
+and 
   texpr =
   | UserType of string
   | IntType
@@ -101,10 +103,10 @@ let rec string_of_expr e =
   | Proc(x,Some t,body)-> "Proc("^x^"," ^string_of_texpr t^","^ string_of_expr body ^")"
   | App(e1,e2) -> "App("^string_of_expr e1 ^"," ^ string_of_expr e2^")"
   | IsZero(e) -> "Zero?("^string_of_expr e ^")"
-  | ITE(e1,e2,e3) -> "IfThenElse("^string_of_expr e1^"," ^ string_of_expr e2^"," ^ string_of_expr e3  ^")"
-  | Letrec(x,param,None,None,def,body) -> "Letrec("^x^","^param^","^ string_of_expr def ^","^ string_of_expr body ^")"
-  | Letrec(x,param,Some tPara,Some tRes,def,body) -> "Letrec("^string_of_texpr
-  tRes^" "^x^","^param^":"^string_of_texpr tPara ^","^ string_of_expr def ^","^ string_of_expr body ^")"
+  | ITE(e1,e2,e3) -> "ITE("^string_of_expr e1^"," ^ string_of_expr e2^"," ^ string_of_expr e3  ^")"
+  | Letrec(rdecs,body) ->
+    "Letrec("^
+    String.concat "," (List.map string_of_rdecl rdecs)  ^","^ string_of_expr body ^")" 
   | Set(x,rhs) -> "Set("^x^","^string_of_expr rhs^")"
   | BeginEnd(es) -> "BeginEnd(" ^ String.concat "," (List.map string_of_expr es) ^")"
   | Debug(e) -> "Debug("^string_of_expr e^")"
@@ -130,7 +132,19 @@ let rec string_of_expr e =
                                              es)^")"
   | IsInstanceOf(e,id) -> "InstanceOf(" ^ (string_of_expr e) ^ "," ^ id ^ ")"
   | _ -> failwith "Not implemented"
-and string_of_texpr = function
+and
+  string_of_rdecl = function
+  | (id,par,tpar_op,tres_op,def) ->
+    id^"("^par^")"
+    ^ (match tpar_op with
+        | None -> ""
+        | Some t -> string_of_texpr t)
+    ^ (match tres_op with
+        | None ->  ""
+        | Some t ->  ":"^ string_of_texpr t) 
+    ^ "="^ string_of_expr def
+and
+  string_of_texpr = function
   | UserType id -> id
   | IntType -> "int"
   | BoolType -> "bool"
@@ -141,3 +155,4 @@ and string_of_texpr = function
   | RecordType(fs) -> "RecordType("^ String.concat "," (List.map (fun (id,t) ->
   id^":"^string_of_texpr t) fs) ^")"
   | PairType(t1,t2) -> "("^string_of_texpr t1^"*"^string_of_texpr t2^")"
+

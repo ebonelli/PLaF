@@ -131,8 +131,7 @@ expr:
 | FST; LPAREN; e=expr; RPAREN { Fst(e) }
 | SND; LPAREN; e=expr; RPAREN { Snd(e) }
 | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
-| LETREC; x = ID; LPAREN; y = ID; targ=option(type_annotation); RPAREN; tres=option(type_annotation); EQUALS; e1 = expr; IN;
-  e2 = expr { Letrec(x,y,targ,tres,e1,e2) }
+| LETREC; decs = nonempty_list(rdecs); IN; e = expr { Letrec(decs, e) }
 | PROC; LPAREN; x = ID; t = option(type_annotation); RPAREN; LBRACE; e = expr;
   RBRACE { Proc(x,t,e) }
 | LPAREN; e1 = expr; e2 = expr; RPAREN { App(e1,e2) }
@@ -176,6 +175,11 @@ expr:
 | INSTANCEOF LPAREN; e=expr; COMMA; id=ID; RPAREN { IsInstanceOf(e,id) }
 | CAST; LPAREN; e1=expr; COMMA; id=ID; RPAREN { Cast(e1,id) }
 
+rdecs:
+| x = ID; LPAREN; y = ID; targ=option(type_annotation); RPAREN;
+  tres=option(type_annotation); EQUALS;
+  e = expr  { (x, y, targ, tres, e) };
+  
 type_annotation:
 | COLON; t=texpr { t } 
 
