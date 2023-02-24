@@ -187,7 +187,7 @@ and
     in return en >>+
     extend_env id (RefVal l) >>+
     eval_expr e
-  | Letrec(id,par,_tParam,_tRes,e,target) ->
+  | Letrec([(id,par,_tParam,_tRes,e)],target) ->
     let l = Store.new_ref g_store UnitVal in
     extend_env id (RefVal l) >>+
     (lookup_env >>= fun env ->

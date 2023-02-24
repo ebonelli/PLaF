@@ -41,9 +41,9 @@ let rec chk_expr : expr -> texpr tea_result = function
     if t1=t3
     then return t2
     else error "app: type of argument incorrect"
-  | Letrec(_id,_param,None,_,_body,_target) | Letrec(_id,_param,_,None,_body,_target) ->
+  | Letrec([(_id,_param,None,_,_body)],_target) | Letrec([(_id,_param,_,None,_body)],_target) ->
     error "letrec: type declaration missing"
-  | Letrec(id,param,Some tParam,Some tRes,body,target) ->
+  | Letrec([(id,param,Some tParam,Some tRes,body)],target) ->
     extend_tenv id (FuncType(tParam,tRes)) >>+
     (extend_tenv param tParam >>+
      chk_expr body >>= fun t ->
@@ -54,7 +54,7 @@ let rec chk_expr : expr -> texpr tea_result = function
     string_of_tenv >>= fun str ->
     print_endline str;
     error "Debug: reached breakpoint"
-  | _ -> error "chk_expr: implement"    
+  | _ -> failwith "chk_expr: implement"    
 and
   chk_prog (AProg(_,e)) =
   chk_expr e

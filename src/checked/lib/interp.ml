@@ -71,7 +71,7 @@ let rec eval_expr : expr -> exp_val ea_result = fun e ->
     return en >>+
     extend_env id ev >>+
     eval_expr e
-  | Letrec(id,par,_targ,_ty,e,target) ->
+  | Letrec([(id,par,_targ,_ty,e)],target) ->
     extend_env_rec id par e >>+
     eval_expr target 
   | BeginEnd(es) ->
