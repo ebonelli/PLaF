@@ -83,7 +83,7 @@ let rec eval_expr : expr -> exp_val ea_result = fun e ->
     return en >>+
     extend_env id (RefVal (Store.new_ref g_store ev)) >>+
     eval_expr e
-  | Letrec(id,par,_,_,e,target) ->
+  | Letrec([(id,par,_,_,e)],target) ->
     let l = Store.new_ref g_store UnitVal in
     extend_env id (RefVal l) >>+
     (lookup_env >>= fun env ->
