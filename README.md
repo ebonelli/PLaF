@@ -29,3 +29,10 @@ In the folder src/let/lib, type the following
 
 <pre><code>    # dune utop
 </code></pre>
+
+
+## Upgrading dune/menhir
+
+If you get error "Error: Unbound module MenhirLib.LexerUtil", try `opam upgrade menhir`
+
+If you get "Error: Version 3.2 of dune is not supported.", try `opam upgrade dune`
