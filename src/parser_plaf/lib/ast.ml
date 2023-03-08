@@ -130,7 +130,10 @@ let rec string_of_expr e =
   | Send(e1,id,es) -> "Send("^string_of_expr e1^","^id^","^String.concat "," (List.map string_of_expr es)^")"
   | List(es) -> "List("^String.concat "," (List.map string_of_expr
                                              es)^")"
-  | IsInstanceOf(e,id) -> "InstanceOf(" ^ (string_of_expr e) ^ "," ^ id ^ ")"
+  | IsInstanceOf(e,id) -> "InstanceOf(" ^ (string_of_expr e) ^ "," ^
+                          id ^ ")"
+  | Cons(e1,e2) -> "Cons("^string_of_expr e1 ^","^string_of_expr
+  e2^")"
   | _ -> failwith "Not implemented"
 and
   string_of_rdecl = function
