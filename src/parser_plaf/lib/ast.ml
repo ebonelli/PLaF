@@ -37,8 +37,9 @@ and
   | EmptyTree
   | Node of expr*expr*expr
   | CaseT of expr*expr*string*string*string*expr
-  | Record of (string*expr) list
+  | Record of (string*(bool*expr)) list
   | Proj of expr*string
+  | SetField of expr*string*expr
   | Self
   | Send of expr*string*expr list
   | Super of string*expr list
@@ -115,6 +116,12 @@ let rec string_of_expr e =
   | Pair(e1,e2) -> "Pair(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
   | Unpair(x,y,e1,e2) -> "Unpair("^x^","^y^","^string_of_expr e1 ^","^
                          string_of_expr e2 ^")"
+  | Record(fs) ->  "{"^  String.concat ";"
+                     (List.map (fun (id,(mut,e)) ->
+                          id^(if mut then "="
+                              else "<=") ^string_of_expr e) fs) ^"}"
+  | SetField(e1,id,e2) -> string_of_expr e1 ^ "." ^ id  ^ "<=" ^
+                          string_of_expr e2
   | EmptyList -> "EmptyList"
   | EmptyTree -> "EmptyTree"
   | Node(e1,e2,e3) -> "Node("^string_of_expr e1^"," ^ string_of_expr

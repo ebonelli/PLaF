@@ -32,6 +32,7 @@ open Ast
 %token MAXL 
 %token LET
 %token EQUALS
+%token EQUALSMUTABLE
 %token IN
 %token PROC
 %token ISZERO
@@ -85,12 +86,12 @@ open Ast
 
 (* Precedence and associativity *)
 
-%nonassoc IN ELSE EQUALS            /* lowest precedence */
+%nonassoc IN ELSE EQUALS EQUALSMUTABLE /* lowest precedence */
 %right ARROW
 %left PLUS MINUS
 %left TIMES DIVIDED   
 %left DOT    
-%nonassoc REFTYPE                   /* highest precedence */
+%nonassoc REFTYPE                      /* highest precedence */
                           (*%nonassoc UMINUS        /* highest precedence */*)
 
 
@@ -159,6 +160,7 @@ expr:
       ARROW;  e3=expr; RBRACE { CaseT(e1,e2,id1,id2,id3,e3) }
 | LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
 | e1=expr; DOT; id=ID { Proj(e1,id) }
+| e1=expr; DOT; id=ID; EQUALSMUTABLE; e=expr { SetField(e1,id,e) }
 | NEW; id=ID; LPAREN; args = separated_list(COMMA, expr);
   RPAREN { NewObject(id,args) }
 | SELF; { Self }
@@ -184,7 +186,8 @@ type_annotation:
 | COLON; t=texpr { t } 
 
 field:
-| id = ID; EQUALS; e=expr { (id,e) }
+    | id = ID; EQUALS; e=expr { (id,(false,e)) }
+    | id = ID; EQUALSMUTABLE; e=expr { (id,(true,e)) }
     
 fieldtype:
 | id = ID; COLON; t=texpr { (id,t) }

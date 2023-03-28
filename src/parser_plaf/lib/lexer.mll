@@ -51,6 +51,7 @@ rule read =
   | "maxl"    { MAXL }
   | "let"     { LET }
   | "="       { EQUALS }
+  | "<="      { EQUALSMUTABLE }
   | "in"      { IN }
   | "proc"    { PROC }
   | "zero?"   { ISZERO }
