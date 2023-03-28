@@ -24,6 +24,8 @@ open Ast
 %token RBRACE
 %token LANGLE
 %token RANGLE
+%token LLANGLE
+%token RRANGLE
 %token ABS
 %token MIN
 %token SUM 
@@ -36,6 +38,7 @@ open Ast
 %token IN
 %token PROC
 %token ISZERO
+%token ISNUMBER
 %token IF
 %token THEN
 %token ELSE
@@ -88,8 +91,8 @@ open Ast
 
 %nonassoc IN ELSE EQUALS EQUALSMUTABLE /* lowest precedence */
 %right ARROW
-%left PLUS MINUS
-%left TIMES DIVIDED   
+%left PLUS MINUS LLANGLE RRANGLE  
+%left TIMES DIVIDED 
 %left DOT    
 %nonassoc REFTYPE                      /* highest precedence */
                           (*%nonassoc UMINUS        /* highest precedence */*)
@@ -137,6 +140,10 @@ expr:
   RBRACE { Proc(x,t,e) }
 | LPAREN; e1 = expr; e2 = expr; RPAREN { App(e1,e2) }
 | ISZERO; LPAREN; e = expr; RPAREN { IsZero(e) }
+| ISNUMBER; LPAREN; e = expr; RPAREN { IsNumber(e) }
+| e1 = expr; EQUALS; e2 = expr { IsEqual(e1,e2) }
+| e1 = expr; RRANGLE; e2 = expr { IsGT(e1,e2) }
+| e1 = expr; LLANGLE; e2 = expr { IsLT(e1,e2) }
 | NEWREF; LPAREN; e = expr; RPAREN { NewRef(e) }
 | DEREF; LPAREN; e = expr; RPAREN { DeRef(e) }
 | SETREF; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { SetRef(e1,e2) }

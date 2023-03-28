@@ -39,6 +39,8 @@ rule read =
   | "}"       { RBRACE }
   | "<"       { LANGLE }
   | ">"       { RANGLE }
+  | "<<"      { LLANGLE }
+  | ">>"      { RRANGLE }
   | ";"       { SEMICOLON }
   | ":"       { COLON }
   | ","       { COMMA }
@@ -55,6 +57,7 @@ rule read =
   | "in"      { IN }
   | "proc"    { PROC }
   | "zero?"   { ISZERO }
+  | "number?" { ISNUMBER }
   | "if"      { IF }
   | "then"    { THEN }
   | "else"    { ELSE }
