@@ -39,6 +39,8 @@ rule read =
   | "}"       { RBRACE }
   | "<"       { LANGLE }
   | ">"       { RANGLE }
+  | "<<"      { LLANGLE }
+  | ">>"      { RRANGLE }
   | ";"       { SEMICOLON }
   | ":"       { COLON }
   | ","       { COMMA }
@@ -51,9 +53,11 @@ rule read =
   | "maxl"    { MAXL }
   | "let"     { LET }
   | "="       { EQUALS }
+  | "<="      { EQUALSMUTABLE }
   | "in"      { IN }
   | "proc"    { PROC }
   | "zero?"   { ISZERO }
+  | "number?" { ISNUMBER }
   | "if"      { IF }
   | "then"    { THEN }
   | "else"    { ELSE }
