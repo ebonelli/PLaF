@@ -9,7 +9,7 @@
 
 (menhir
  (modules grammar)
-;; (flags -lg 1 -la 1 -lc 2 --dump)
+ ;; (flags -lg 1 -la 1 -lc 2 --dump --explain)
 )
 
 ; the next line avoids warnings from stopping the build

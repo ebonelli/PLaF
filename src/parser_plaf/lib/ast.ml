@@ -18,6 +18,7 @@ and
   | Maxl of expr list
   | Let of string*expr*expr
   | IsZero of expr
+  | IsNumber of expr
   | ITE of expr*expr*expr
   | Proc of string*texpr option*expr
   | App of expr*expr
@@ -37,8 +38,12 @@ and
   | EmptyTree
   | Node of expr*expr*expr
   | CaseT of expr*expr*string*string*string*expr
-  | Record of (string*expr) list
+  | Record of (string*(bool*expr)) list
   | Proj of expr*string
+  | SetField of expr*string*expr
+  | IsEqual of expr*expr                           
+  | IsGT of expr*expr
+  | IsLT of expr*expr
   | Self
   | Send of expr*string*expr list
   | Super of string*expr list
@@ -103,6 +108,7 @@ let rec string_of_expr e =
   | Proc(x,Some t,body)-> "Proc("^x^"," ^string_of_texpr t^","^ string_of_expr body ^")"
   | App(e1,e2) -> "App("^string_of_expr e1 ^"," ^ string_of_expr e2^")"
   | IsZero(e) -> "Zero?("^string_of_expr e ^")"
+  | IsNumber(e) -> "Number?("^string_of_expr e ^")"
   | ITE(e1,e2,e3) -> "ITE("^string_of_expr e1^"," ^ string_of_expr e2^"," ^ string_of_expr e3  ^")"
   | Letrec(rdecs,body) ->
     "Letrec("^
@@ -115,6 +121,16 @@ let rec string_of_expr e =
   | Pair(e1,e2) -> "Pair(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
   | Unpair(x,y,e1,e2) -> "Unpair("^x^","^y^","^string_of_expr e1 ^","^
                          string_of_expr e2 ^")"
+  | Record(fs) ->  "{"^  String.concat ";"
+                     (List.map (fun (id,(mut,e)) ->
+                          id^(if mut then "="
+                              else "<=") ^string_of_expr e) fs) ^"}"
+  | Proj(e,id) -> "Proj(" ^ (string_of_expr e) ^ "," ^ id ^ ")"
+  | SetField(e1,id,e2) -> string_of_expr e1 ^ "." ^ id  ^ "<=" ^
+                          string_of_expr e2
+  | IsEqual(e1,e2) -> "IsEqual(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
+  | IsGT(e1,e2) -> "IsGT(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
+  | IsLT(e1,e2) -> "IsLT(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
   | EmptyList -> "EmptyList"
   | EmptyTree -> "EmptyTree"
   | Node(e1,e2,e3) -> "Node("^string_of_expr e1^"," ^ string_of_expr
@@ -130,11 +146,10 @@ let rec string_of_expr e =
   | Send(e1,id,es) -> "Send("^string_of_expr e1^","^id^","^String.concat "," (List.map string_of_expr es)^")"
   | List(es) -> "List("^String.concat "," (List.map string_of_expr
                                              es)^")"
-  | IsInstanceOf(e,id) -> "InstanceOf(" ^ (string_of_expr e) ^ "," ^
-                          id ^ ")"
   | Cons(e1,e2) -> "Cons("^string_of_expr e1 ^","^string_of_expr
   e2^")"
-  | _ -> failwith "Not implemented"
+  | IsInstanceOf(e,id) -> "InstanceOf(" ^ (string_of_expr e) ^ "," ^ id ^ ")"
+  | _ -> failwith "string_of_expr: Not implemented"
 and
   string_of_rdecl = function
   | (id,par,tpar_op,tres_op,def) ->
