@@ -1,5 +1,5 @@
 (tests
- (names student_test)
+ (names student_test graded_test)
  (libraries oUnit sool))
 
 (env
