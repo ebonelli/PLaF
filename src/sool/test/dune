@@ -1,6 +1,6 @@
 (tests
- (names graded_test student_test)
- (libraries oUnit tsool))
+ (names student_test)
+ (libraries oUnit sool))
 
 (env
  (dev

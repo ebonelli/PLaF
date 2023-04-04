@@ -208,7 +208,8 @@ and
     return (List.hd (List.rev vs))
   (* Record operations *)
   | Record(fs) ->
-    let (ids,es) = List.split fs
+    let (ids,fes) = List.split fs
+    in let (_flags,es) = List.split fes
     in sequence (List.map eval_expr es) >>= fun evs ->
     return @@ RecordVal (List.combine ids evs)
   | Proj(e,id) ->

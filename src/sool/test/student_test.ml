@@ -1,5 +1,5 @@
 open OUnit2
-open Tsool.Ds
+open Sool.Ds
 open Test_lib
 
 (* run tests with

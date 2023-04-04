@@ -1,7 +1,7 @@
 open OUnit2
-open Tsool.Ds
-open Tsool.ReM
-open Tsool.Interp
+open Sool.Ds
+open Sool.ReM
+open Sool.Interp
 
 
 (* Generic error result for tests that should produce an error *)
