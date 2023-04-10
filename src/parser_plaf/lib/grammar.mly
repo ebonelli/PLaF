@@ -160,9 +160,9 @@ expr:
 | LANGLE; es = separated_list(COMMA, expr) ; RANGLE { Tuple(es) }
 | LET; LANGLE; is = separated_list(COMMA, ID) ;RANGLE; EQUALS; e1 = expr; IN;
   e2 = expr { Untuple(is,e1,e2) }
-| EMPTYTREE { EmptyTree }
+| EMPTYTREE; LPAREN; t = option(texpr); RPAREN { EmptyTree(t) }
 | NODE; LPAREN; e1 = expr; COMMA; e2=expr; COMMA; e3=expr; RPAREN { Node(e1,e2,e3) }
-| CASET; e1 = expr; OF; LBRACE; EMPTYTREE; ARROW; e2=expr; COMMA;
+| CASET; e1 = expr; OF; LBRACE; EMPTYTREE; LPAREN; RPAREN; ARROW; e2=expr; COMMA;
       NODE; LPAREN; id1 = ID; COMMA; id2=ID; COMMA; id3=ID; RPAREN;
       ARROW;  e3=expr; RBRACE { CaseT(e1,e2,id1,id2,id3,e3) }
 | LBRACE; fs = separated_list(SEMICOLON, field); RBRACE { Record(fs) }
@@ -176,7 +176,7 @@ expr:
 | SUPER; id=ID; LPAREN; args = separated_list(COMMA, expr);
   RPAREN { Super(id,args) }
 | LIST; LPAREN; es= separated_list(COMMA, expr); RPAREN { List(es)}
-| EMPTYLIST { EmptyList }
+| EMPTYLIST; LPAREN; t = option(texpr); RPAREN { EmptyList(t) }
 | HD; LPAREN; e = expr; RPAREN { Hd(e) }
 | TL; LPAREN; e = expr; RPAREN { Tl(e) }
 | EMPTYPRED; LPAREN; e = expr; RPAREN { IsEmpty(e) }
@@ -193,8 +193,8 @@ type_annotation:
 | COLON; t=texpr { t } 
 
 field:
-    | id = ID; EQUALS; e=expr { (id,(false,e)) }
-    | id = ID; EQUALSMUTABLE; e=expr { (id,(true,e)) }
+| id = ID; EQUALS; e=expr { (id,(false,e)) }
+| id = ID; EQUALSMUTABLE; e=expr { (id,(true,e)) }
     
 fieldtype:
 | id = ID; COLON; t=texpr { (id,t) }

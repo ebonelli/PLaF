@@ -35,7 +35,7 @@ and
   | Untuple of string list * expr*expr               
   | Pair of expr*expr
   | Unpair of string*string*expr*expr
-  | EmptyTree
+  | EmptyTree of texpr option
   | Node of expr*expr*expr
   | CaseT of expr*expr*string*string*string*expr
   | Record of (string*(bool*expr)) list
@@ -48,7 +48,7 @@ and
   | Send of expr*string*expr list
   | Super of string*expr list
   | NewObject of string*expr list
-  | EmptyList
+  | EmptyList of texpr option 
   | Cons of expr*expr
   | Hd of expr
   | Tl of expr 
@@ -76,6 +76,7 @@ and
   | FuncType of texpr*texpr
   | RefType of texpr
   | ListType of texpr
+  | TreeType of texpr
   | RecordType of (string*texpr) list
   | PairType of texpr*texpr
 
@@ -131,8 +132,12 @@ let rec string_of_expr e =
   | IsEqual(e1,e2) -> "IsEqual(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
   | IsGT(e1,e2) -> "IsGT(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
   | IsLT(e1,e2) -> "IsLT(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
-  | EmptyList -> "EmptyList"
-  | EmptyTree -> "EmptyTree"
+  | EmptyList(t) -> "EmptyList(" ^(match t with
+        | None -> ""
+        | Some t -> string_of_texpr t)^")"
+  | EmptyTree(t) -> "EmptyTree(" ^(match t with
+        | None -> ""
+        | Some t -> string_of_texpr t)^")"
   | Node(e1,e2,e3) -> "Node("^string_of_expr e1^"," ^ string_of_expr
                         e2^"," ^ string_of_expr e3  ^")"
   |  CaseT(e1,e_empty,did,lid,rid,e_node) -> "CaseT "^string_of_expr e1^" of
@@ -171,6 +176,7 @@ and
   | FuncType(t1,t2) -> "("^string_of_texpr t1^"->"^string_of_texpr t2^")"
   | RefType(t) -> "Ref("^string_of_texpr t^")"
   | ListType(t) -> "List("^string_of_texpr t^")"
+  | TreeType(t) -> "Tree("^string_of_texpr t^")"
   | RecordType(fs) -> "RecordType("^ String.concat "," (List.map (fun (id,t) ->
   id^":"^string_of_texpr t) fs) ^")"
   | PairType(t1,t2) -> "("^string_of_texpr t1^"*"^string_of_texpr t2^")"
