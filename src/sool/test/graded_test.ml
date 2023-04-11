@@ -94,7 +94,7 @@ in begin
      set t1 = send o1 gets();
      send o1 sets(33);
      set t2 = send o1 gets();
-     list(t1, t2)
+     mklist(t1, t2)
   end",Ok (ListVal [NumVal 44; NumVal 33]),0);
 
  Interp("self1","class c extends object  {
@@ -111,7 +111,7 @@ in let       t2 = 0
        set t1 = send o gets();
        send o testit();
        set t2 = send o gets();
-       list(t1,t2)
+       mklist(t1,t2)
       end",Ok (ListVal [NumVal 11; NumVal 13])
        ,0);
 
@@ -129,7 +129,7 @@ in begin
     set t1 = send o1 getcount();
     send o1 countup();
     set t2 = send o1 getcount();
-    list(t1,t2)
+    mklist(t1,t2)
    end",Ok (ListVal [NumVal 0; NumVal 1]),0);
 
   Interp("sharedf-counter","
@@ -153,7 +153,7 @@ class c1 extends object  {
       send counter1 countup();
       set n = n+1
      end}
-   method getstate(){list(n, send counter1 getcount())}
+   method getstate(){mklist(n, send counter1 getcount())}
  }  
 let counter1 = new counter()
 in let o1 = new c1(counter1)
@@ -162,7 +162,7 @@ in begin
      send o1 countup();
      send o2 countup();
      send o2 countup();
-     list( send o1 getstate(),
+     mklist( send o1 getstate(),
            send o2 getstate())
    end",Ok (ListVal [ListVal [NumVal 1; NumVal 3]; ListVal [NumVal 2; NumVal 3]]),0);
 
