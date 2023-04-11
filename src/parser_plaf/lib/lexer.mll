@@ -74,6 +74,10 @@ rule read =
   | "pair"    { PAIR }
   | "unpair"  { UNPAIR }
   | "emptylist" { EMPTYLIST }
+  | "mklist"  { MKLIST }
+  | "cons"    { CONS }
+  | "hd"      { HD }
+  | "tl"      { TL }
   | "emptytree" { EMPTYTREE }
   | "node"      { NODE }
   | "caseT"     { CASET }
@@ -87,10 +91,6 @@ rule read =
   | "field"   { FIELD }
   | "self"    { SELF }
   | "new"     { NEW }
-  | "list"    { LIST }
-  | "cons"    { CONS }
-  | "hd"      { HD }
-  | "tl"      { TL }
   | "empty?"   { EMPTYPRED }
   | "implements"  { IMPLEMENTS }
   | "instanceof?"  { INSTANCEOF }
@@ -100,6 +100,8 @@ rule read =
   | "bool"   { BOOLTYPE }
   | "unit"   { UNITTYPE }
   | "ref"    { REFTYPE }
+  | "list"   { LISTTYPE }
+  | "tree"   { TREETYPE }
   | id       { ID (Lexing.lexeme lexbuf) }
   | eof      { EOF }
   | _

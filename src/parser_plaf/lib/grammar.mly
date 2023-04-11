@@ -70,7 +70,7 @@ open Ast
 %token SELF
 %token FIELD
 %token NEW
-%token LIST
+%token MKLIST
 %token CONS 
 %token HD 
 %token TL
@@ -85,16 +85,18 @@ open Ast
 %token BOOLTYPE "bool"
 %token UNITTYPE "unit"
 %token REFTYPE "ref"
+%token TREETYPE "tree"
+%token LISTTYPE "list"
 %token EOF
 
 (* Precedence and associativity *)
 
-%nonassoc IN ELSE EQUALS EQUALSMUTABLE /* lowest precedence */
+%nonassoc IN ELSE EQUALS EQUALSMUTABLE  /* lowest precedence */
 %right ARROW
 %left PLUS MINUS LLANGLE RRANGLE  
 %left TIMES DIVIDED 
-%left DOT    
-%nonassoc REFTYPE                      /* highest precedence */
+%left DOT    /* highest precedence */
+%nonassoc REFTYPE LISTTYPE TREETYPE
                           (*%nonassoc UMINUS        /* highest precedence */*)
 
 
@@ -175,7 +177,7 @@ expr:
   RPAREN { Send(e,id,args) }
 | SUPER; id=ID; LPAREN; args = separated_list(COMMA, expr);
   RPAREN { Super(id,args) }
-| LIST; LPAREN; es= separated_list(COMMA, expr); RPAREN { List(es)}
+| MKLIST; LPAREN; es= separated_list(COMMA, expr); RPAREN { List(es)}
 | EMPTYLIST; LPAREN; t = option(texpr); RPAREN { EmptyList(t) }
 | HD; LPAREN; e = expr; RPAREN { Hd(e) }
 | TL; LPAREN; e = expr; RPAREN { Tl(e) }
@@ -239,6 +241,8 @@ texpr:
 | t1 = texpr; TIMES; t2 = texpr { PairType(t1,t2) }
 | LPAREN; t1 = texpr; RPAREN { t1 }
 | "ref"; t1 = texpr { RefType(t1) }
+| "tree"; t1 = texpr { TreeType(t1) }
+| "list"; t1 = texpr { ListType(t1) }
 | LBRACE; ts = separated_list(SEMICOLON, fieldtype); RBRACE { RecordType(ts) }
      
 
