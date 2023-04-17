@@ -204,13 +204,13 @@ and
   | BeginEnd([]) ->
     return UnitVal
   | BeginEnd(es) -> 
-    sequence (List.map eval_expr es) >>= fun vs ->
+    eval_exprs es >>= fun vs ->
     return (List.hd (List.rev vs))
   (* Record operations *)
   | Record(fs) ->
     let (ids,fes) = List.split fs
     in let (_flags,es) = List.split fes
-    in sequence (List.map eval_expr es) >>= fun evs ->
+    in eval_exprs es >>= fun evs ->
     return @@ RecordVal (List.combine ids evs)
   | Proj(e,id) ->
     eval_expr e >>=
@@ -220,7 +220,7 @@ and
     | Some ev -> return ev)
   (* SOOL operations *)
   | NewObject(c_name,es) ->
-    sequence (List.map eval_expr es) >>= fun args ->
+    eval_exprs es >>= fun args ->
     (match List.assoc_opt c_name !g_class_env with
      | None -> error ("NewObject: lookup_class: class "^c_name^" not found")
      | Some (_super,fields,methods) -> 
@@ -233,14 +233,14 @@ and
   | Send(e,m_name,es) ->
     eval_expr e >>= fun self ->
     obj_of_objectVal self >>= fun (c_name,_) ->
-    sequence (List.map eval_expr es) >>= fun args ->
+    eval_exprs es >>= fun args ->
     (match lookup_method c_name m_name !g_class_env with
     | None -> error "Method not found"
     | Some m -> apply_method m_name self args m)
   | Self ->
     eval_expr (Var "_self")
   | Super(m_name,es) ->
-    sequence (List.map eval_expr es) >>= fun args ->
+    eval_exprs es >>= fun args ->
     eval_expr (Var "_super") >>=
     string_of_stringVal >>= fun c_name ->
     eval_expr (Var "_self") >>= fun self ->
@@ -249,7 +249,7 @@ and
     | Some m -> apply_method m_name self args m)
   (* List operations* *)
   | List(es) ->
-    sequence (List.map eval_expr es) >>= fun args ->
+    eval_exprs es >>= fun args ->
     return @@ ListVal args
   | Cons(e1,e2) ->
     eval_expr e1 >>= fun ev ->
@@ -275,6 +275,15 @@ and
     in (print_endline (str_env^"\n"^str_store);
     error "Reached breakpoint")
   | _ -> failwith ("eval_expr: Not implemented: "^string_of_expr e)
+and
+  eval_exprs : expr list -> exp_val list ea_result =
+  fun es ->
+  match es with
+  | [] -> return []
+  | h::t ->
+    eval_expr h >>= fun ev ->
+    eval_exprs t >>= fun evs ->
+    return (ev::evs)
 and
   eval_prog : prog -> exp_val ea_result =
   fun (AProg(cs, e)) ->
