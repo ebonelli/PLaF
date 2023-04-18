@@ -1,5 +1,5 @@
-(* counter *)
-class counter extends object { 
+(* counterc *)
+class counterc extends object { 
   field c
   method initialize() { set c=7 }
   method add(i) { set c=c+i }
@@ -8,12 +8,14 @@ class counter extends object {
 }
 
 (* reset counter *)
-class resetc extends counter { 
-  method reset() { set c=0 }
+class resetc extends counterc {
+  field v
+  method reset() { set c=v }
+  method setReset(i) { set v=i }
 }
 
 (* backup counter *)
-class bkpc extends resetc {
+class bkpcc extends resetc {
   field b
   method initialize() {
     begin
@@ -32,7 +34,7 @@ class bkpc extends resetc {
  }
 
 (* main expression *)
-let o = new bkpc()
+let o = new bkpcc  ()
 in begin
      send o add(10); 
      send o bump();
