@@ -31,13 +31,6 @@ class bkpcc extends resetc {
       super add(i)
     end
   }
-  method add(i,j) {
-    begin
-      send self backup();
-      super add(i);
-      super add(j)
-    end
-  }
   method backup() { set b=c }
   method restore() { set c=b}
  }
@@ -45,10 +38,9 @@ class bkpcc extends resetc {
 (* main expression *)
 let o = new bkpcc  ()
 in begin
-(*     send o add(10); 
-     send o bump();*)
+     send o add(10); 
+     send o bump();
      send o restore();
-     send o add(2,3);
      send o read()
    end
    
