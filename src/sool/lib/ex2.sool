@@ -1,3 +1,5 @@
+(* Example 2 *)
+
 class counter extends object {
   field c
   method initialize() { set c=7 }
