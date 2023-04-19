@@ -21,7 +21,7 @@ and
     (match ev with
      | Thunk(e,en) -> return en >>+ eval_expr e 
     | _ -> return ev)
-  | Letrec(id,par,_,_,e,target) ->
+  | Letrec([id,par,_,_,e],target) ->
     let l = Store.new_ref g_store UnitVal
     in 
     extend_env id (RefVal l) >>+

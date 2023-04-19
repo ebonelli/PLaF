@@ -26,7 +26,7 @@ and
   (* | Letrec(id,par,_,_e,target) ->
    *   extend_env_rec id par e >>+
    *   eval_expr target *)
-  | Letrec(id,par,_,_,e,target) ->
+  | Letrec([id,par,_,_,e],target) ->
     let l = Store.new_ref g_store UnitVal
     in 
     extend_env id (RefVal l) >>+
