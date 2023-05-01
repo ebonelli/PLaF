@@ -81,6 +81,7 @@ and
   | RefType of texpr
   | ListType of texpr
   | TreeType of texpr
+  | StackType of texpr
   | RecordType of (string*texpr) list
   | PairType of texpr*texpr
 
@@ -184,4 +185,5 @@ and
   | RecordType(fs) -> "RecordType("^ String.concat "," (List.map (fun (id,t) ->
   id^":"^string_of_texpr t) fs) ^")"
   | PairType(t1,t2) -> "("^string_of_texpr t1^"*"^string_of_texpr t2^")"
+  | StackType(t) -> "Stack("^string_of_texpr t^")"
 
