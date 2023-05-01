@@ -129,7 +129,7 @@ let rec string_of_expval = function
 and
   string_of_env'  = function
   | EmptyEnv -> ""
-  | ExtendEnv(id,v,env) -> "("^id^","^string_of_expval v^")"^string_of_env' env
+  | ExtendEnv(id,v,env) -> string_of_env' env^"("^id^","^string_of_expval v^")"
 (*  | ExtendEnvRec(id,param,body,env) -> "("^id^","^param^","^string_of_expr body^")"^string_of_env' env
 *)
 let string_of_env : string ea_result =
