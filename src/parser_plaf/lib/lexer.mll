@@ -92,6 +92,10 @@ rule read =
   | "self"    { SELF }
   | "new"     { NEW }
   | "empty?"   { EMPTYPRED }
+  | "emptystack"   { EMPTYSTACK }
+  | "push"   { PUSH }
+  | "pop"   { POP }
+  | "peek"   { PEEK }
   | "implements"  { IMPLEMENTS }
   | "instanceof?"  { INSTANCEOF }
   | "interface"  { INTERFACE }

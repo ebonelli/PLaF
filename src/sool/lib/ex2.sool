@@ -29,9 +29,11 @@ class bkpc extends resetc {
  }
 
 let o = new bkpc()
-in begin
+in o
+
+(* begin
      send o add(10); 
      send o bump();
      send o restore();
      send o read()
-   end
+   end *)

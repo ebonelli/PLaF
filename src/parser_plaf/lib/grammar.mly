@@ -77,6 +77,10 @@ open Ast
 %token EMPTYPRED 
 %token COMMA
 %token DOT
+%token EMPTYSTACK
+%token PUSH
+%token POP
+%token PEEK
 %token IMPLEMENTS
 %token INSTANCEOF
 %token INTERFACE
@@ -182,6 +186,10 @@ expr:
 | HD; LPAREN; e = expr; RPAREN { Hd(e) }
 | TL; LPAREN; e = expr; RPAREN { Tl(e) }
 | EMPTYPRED; LPAREN; e = expr; RPAREN { IsEmpty(e) }
+| EMPTYSTACK; LPAREN; t = option(texpr); RPAREN { EmptyStack(t) }
+| PUSH; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Push(e1,e2) }
+| POP; LPAREN; e1 = expr; RPAREN { Pop(e1) }
+| PEEK; LPAREN; e1 = expr; RPAREN { Peek(e1) }
 | CONS; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Cons(e1,e2) }
 | INSTANCEOF LPAREN; e=expr; COMMA; id=ID; RPAREN { IsInstanceOf(e,id) }
 | CAST; LPAREN; e1=expr; COMMA; id=ID; RPAREN { Cast(e1,id) }

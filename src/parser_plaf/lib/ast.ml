@@ -56,6 +56,10 @@ and
   | List of expr list
   | IsInstanceOf of expr*string
   | Cast of expr*string
+  | EmptyStack of texpr option
+  | Push of expr*expr
+  | Pop of expr
+  | Peek of expr
   | Debug of expr
 and (* recursive function declarations *)
   rdecs = (string*string*texpr option*texpr option*expr) list
