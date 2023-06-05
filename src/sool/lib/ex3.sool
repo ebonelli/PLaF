@@ -3,7 +3,7 @@
 (* counterc *)
 class counterc extends object { 
   field c
-  method initialize() { set c=7 }
+  method initialize() { set c=7 }  
   method add(i) { set c=c+i }
   method bump() { send self add(1) }
   method read() { c }
@@ -13,18 +13,18 @@ class counterc extends object {
 class resetc extends counterc {
   field v
   method reset() { set c=v }
-  method setReset(i) { set v=i }
+  method setReset(i,j,k) { set v=i }
 }
 
 (* backup counter *)
 class bkpcc extends resetc {
   field b
-  method initialize() {
+(*  method initialize() {
     begin
       super initialize();
       set b=12
     end
-  }
+  } *) 
   method add(i) {
     begin
       send self backup();
@@ -36,6 +36,11 @@ class bkpcc extends resetc {
  }
 
 (* main expression *)
+
+let o = new bckpcc()
+in debug(o)
+
+(*
 let o = new bkpcc  ()
 in begin
      send o add(10); 
@@ -43,4 +48,4 @@ in begin
      send o restore();
      send o read()
    end
-   
+*)
