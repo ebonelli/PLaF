@@ -74,17 +74,32 @@ open Ast
 %token CONS 
 %token HD 
 %token TL
-%token EMPTYPRED 
+%token ISEMPTY 
 %token COMMA
 %token DOT
 %token EMPTYSTACK
 %token PUSH
 %token POP
-%token PEEK
+%token TOP
+%token SIZE
 %token IMPLEMENTS
 %token INSTANCEOF
 %token INTERFACE
 %token CAST
+%token MKSET 
+%token EMPTYSET 
+%token INSERTSET 
+%token UNIONSET 
+%token ISSUBSET 
+%token ISMEMBER 
+%token EMPTYQUEUE 
+%token ADDQ 
+%token REMOVEQ 
+%token TOPQ 
+%token EMPTYHTBL 
+%token INSERTHTBL 
+%token LOOKUPHTBL 
+%token REMOVEHTBL 
 %token INTTYPE "int"
 %token BOOLTYPE "bool"
 %token UNITTYPE "unit"
@@ -185,14 +200,34 @@ expr:
 | EMPTYLIST; LPAREN; t = option(texpr); RPAREN { EmptyList(t) }
 | HD; LPAREN; e = expr; RPAREN { Hd(e) }
 | TL; LPAREN; e = expr; RPAREN { Tl(e) }
-| EMPTYPRED; LPAREN; e = expr; RPAREN { IsEmpty(e) }
-| EMPTYSTACK; LPAREN; t = option(texpr); RPAREN { EmptyStack(t) }
-| PUSH; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Push(e1,e2) }
-| POP; LPAREN; e1 = expr; RPAREN { Pop(e1) }
-| PEEK; LPAREN; e1 = expr; RPAREN { Peek(e1) }
+| ISEMPTY; LPAREN; e = expr; RPAREN { IsEmpty(e) }
 | CONS; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { Cons(e1,e2) }
 | INSTANCEOF LPAREN; e=expr; COMMA; id=ID; RPAREN { IsInstanceOf(e,id) }
 | CAST; LPAREN; e1=expr; COMMA; id=ID; RPAREN { Cast(e1,id) }
+(* Sets *)
+| MKSET; LPAREN; es= separated_list(COMMA, expr); RPAREN { SetExt(es)}
+| EMPTYSET; LPAREN; t = option(texpr); RPAREN { EmptySet(t) }
+| INSERTSET; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { InsertSet(e1,e2) }
+| UNIONSET; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { UnionSet(e1,e2) }
+| ISSUBSET; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { IsSubset(e1,e2) }
+| ISMEMBER; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { IsMember(e1,e2) }
+| SIZE; LPAREN; e1 = expr; RPAREN { Size(e1) }
+(* Stacks *)
+| EMPTYSTACK; LPAREN; t = option(texpr); RPAREN { EmptyStack(t) }
+| PUSH; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { PushStack(e1,e2) }
+| POP; LPAREN; e1 = expr; RPAREN { PopStack(e1) }
+| TOP; LPAREN; e1 = expr; RPAREN { TopStack(e1) }
+(* Queues *)
+| EMPTYQUEUE; LPAREN; t = option(texpr); RPAREN { EmptyQueue(t) }
+| ADDQ; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { AddQueue(e1,e2) }
+| REMOVEQ; LPAREN; e1 = expr; RPAREN { RemoveQueue(e1) }
+| TOPQ; LPAREN; e1 = expr; RPAREN { TopQueue(e1) }
+(* Hashtables *)
+| EMPTYHTBL; LPAREN; RPAREN { EmptyHtbl(None,None) }
+| EMPTYHTBL; LPAREN; t1 = texpr; COMMA; t2=texpr; RPAREN { EmptyHtbl(Some t1,Some t2) }
+| INSERTHTBL; LPAREN; e1 = expr; COMMA; e2 = expr; COMMA; e3 = expr; RPAREN { InsertHtbl(e1,e2,e3) }
+| LOOKUPHTBL; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { LookupHtbl(e1,e2) }
+| REMOVEHTBL; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { RemoveHtbl(e1,e2) }
 
 rdecs:
 | x = ID; LPAREN; y = ID; targ=option(type_annotation); RPAREN;
@@ -208,7 +243,7 @@ field:
     
 fieldtype:
 | id = ID; COLON; t=texpr { (id,t) }
-      
+
 iface_or_class_decl:
 | CLASS; id1=ID; EXTENDS; id2=ID; id3=option(implements_declaration);
   LBRACE; ofs = list(obj_fields); mths = list(method_decl); RBRACE

@@ -91,11 +91,7 @@ rule read =
   | "field"   { FIELD }
   | "self"    { SELF }
   | "new"     { NEW }
-  | "empty?"   { EMPTYPRED }
-  | "emptystack"   { EMPTYSTACK }
-  | "push"   { PUSH }
-  | "pop"   { POP }
-  | "peek"   { PEEK }
+  | "empty?"   { ISEMPTY }
   | "implements"  { IMPLEMENTS }
   | "instanceof?"  { INSTANCEOF }
   | "interface"  { INTERFACE }
@@ -106,6 +102,29 @@ rule read =
   | "ref"    { REFTYPE }
   | "list"   { LISTTYPE }
   | "tree"   { TREETYPE }
+  (* stacks *)
+  | "emptystack"   { EMPTYSTACK }
+  | "push"   { PUSH }
+  | "pop"   { POP }
+  | "top"   { TOP }
+  | "size"   { SIZE }
+  (* sets *)
+  | "mkset"       { MKSET }
+  | "emptyset"    { EMPTYSET }
+  | "insertset"   { INSERTSET }
+  | "unionset"    { UNIONSET }
+  | "subset?"     { ISSUBSET }
+  | "member?"     { ISMEMBER }
+  (* queues *)
+  | "emptyqueue"    { EMPTYQUEUE }
+  | "addq"       { ADDQ }
+  | "removeq"    { REMOVEQ }
+  | "topq"   { TOPQ }
+  (* queues *)
+  | "emptyhtbl"    { EMPTYHTBL }
+  | "inserthtbl"   { INSERTHTBL }
+  | "lookuphtbl"   { LOOKUPHTBL }
+  | "removehtbl"   { REMOVEHTBL }
   | id       { ID (Lexing.lexeme lexbuf) }
   | eof      { EOF }
   | _
@@ -118,4 +137,3 @@ and
   | '\n'     { Lexing.new_line lexbuf; comment lexbuf }
   | eof  { failwith "unterminated comment" }
   | _    { comment lexbuf }  (* skip comments *)
-
