@@ -56,10 +56,29 @@ and
   | List of expr list
   | IsInstanceOf of expr*string
   | Cast of expr*string
+  (* sets *)      
+  | SetExt of expr list
+  | EmptySet of texpr option
+  | InsertSet of expr*expr
+  | UnionSet of expr*expr
+  | IsSubset of expr*expr
+  | IsMember of expr*expr
+  | Size of expr
+  (* stacks *)
   | EmptyStack of texpr option
-  | Push of expr*expr
-  | Pop of expr
-  | Peek of expr
+  | PushStack of expr*expr
+  | PopStack of expr
+  | TopStack of expr
+  (* queues *)
+  | EmptyQueue of texpr option
+  | AddQueue of expr*expr
+  | RemoveQueue of expr
+  | TopQueue of expr
+  (* hashtables *)
+  | EmptyHtbl of texpr option*texpr option
+  | InsertHtbl of expr*expr*expr
+  | LookupHtbl of expr*expr
+  | RemoveHtbl of expr*expr
   | Debug of expr
 and (* recursive function declarations *)
   rdecs = (string*string*texpr option*texpr option*expr) list
