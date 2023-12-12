@@ -52,40 +52,6 @@ let rec chk_expr : expr -> texpr tea_result = function
      else error
          "LetRec: Type of recursive function does not match
 declaration")
-    | EmptyHtbl(_,_) -> failwith "implement me!"
-| InsertHtbl(e1,e2,e3) -> failwith "implement me!"
-| LookupHtbl(e1,e2) ->
-failwith "implement me!"
-| RemoveHtbl(e1,e2) ->
-failwith "implement me!"
-| IsEmpty(e) ->
-failwith "implement me!"
-| Size(e) ->
-  failwith "implement me!"
-      (* Queue operations *)
-  | EmptyQueue(_) ->
-       failwith "implement me"
-  | AddQueue(e1,e2) ->
-       failwith "implement me"
-  | RemoveQueue(e1) ->
-       failwith "implement me"
-  | TopQueue (es) ->
-       failwith "implement me"
-  | Size(e1) ->
-    failwith "implement me"
-        (* Set operations *)
-  | EmptySet(Some t) ->
-       return (SetType(t))
-  | InsertSet(e1,e2) ->
-       failwith "implement me"
-  | UnionSet(e1,e2) ->
-       failwith "implement me"
-  | SetExt (es) ->
-       failwith "implement me"
-  | IsMember(e1,e2) ->
-       failwith "implement me"
-  | IsSubset(e1,e2) ->
-       failwith "implement me"
   | Debug(_e) ->
     string_of_tenv >>= fun str ->
     print_endline str;
