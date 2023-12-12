@@ -102,6 +102,9 @@ rule read =
   | "ref"    { REFTYPE }
   | "list"   { LISTTYPE }
   | "tree"   { TREETYPE }
+  | "sett"   { SETTYPE }
+  | "queue"   { QUEUETYPE }
+  | "htbl"   { HTBLTYPE }
   (* stacks *)
   | "emptystack"   { EMPTYSTACK }
   | "push"   { PUSH }

@@ -101,6 +101,9 @@ and
   | ListType of texpr
   | TreeType of texpr
   | StackType of texpr
+  | SetType of texpr
+  | QueueType of texpr
+  | HtblType of texpr*texpr          
   | RecordType of (string*texpr) list
   | PairType of texpr*texpr
 
@@ -205,4 +208,6 @@ and
   id^":"^string_of_texpr t) fs) ^")"
   | PairType(t1,t2) -> "("^string_of_texpr t1^"*"^string_of_texpr t2^")"
   | StackType(t) -> "Stack("^string_of_texpr t^")"
-
+  | SetType(t) -> "Set("^string_of_texpr t^")"
+  | QueueType(t) -> "Queue("^string_of_texpr t^")"
+  | HtblType(t1,t2) ->  "Htbl("^string_of_texpr t1^","^string_of_texpr t2^")"

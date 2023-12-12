@@ -106,6 +106,9 @@ open Ast
 %token REFTYPE "ref"
 %token TREETYPE "tree"
 %token LISTTYPE "list"
+%token SETTYPE "sett"
+%token QUEUETYPE "queue"
+%token HTBLTYPE "htbl"
 %token EOF
 
 (* Precedence and associativity *)
@@ -286,6 +289,9 @@ texpr:
 | "ref"; t1 = texpr { RefType(t1) }
 | "tree"; t1 = texpr { TreeType(t1) }
 | "list"; t1 = texpr { ListType(t1) }
+| "sett"; LPAREN; t1 = texpr; RPAREN; { SetType(t1) }
+| "queue"; LPAREN; t1 = texpr; RPAREN { QueueType(t1) }
+| "htbl";  LPAREN; t1 = texpr; COMMA; t2 = texpr; RPAREN { HtblType(t1,t2) }
 | LBRACE; ts = separated_list(SEMICOLON, fieldtype); RBRACE { RecordType(ts) }
      
 
