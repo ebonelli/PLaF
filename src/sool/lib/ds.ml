@@ -17,7 +17,7 @@ type exp_val =
   | TupleVal of exp_val list
   | StringVal of string
   | ListVal of exp_val list
-  | RecordVal of (string*exp_val) list
+  | RecordVal of (string*(bool*exp_val)) list
   | UnitVal
   | RefVal of int
   | ObjectVal of string*env
@@ -78,66 +78,77 @@ let rec apply_env : string -> exp_val ea_result =
 
 (* operations on expressed values *)
         
-let int_of_numVal : exp_val -> int ea_result =  function
+let int_of_numVal : exp_val -> int ea_result =
+  function
   |  NumVal n -> return n
   | _ -> error "Expected a number!"
 
-let bool_of_boolVal : exp_val -> bool ea_result =  function
+let bool_of_boolVal : exp_val -> bool ea_result =
+  function
   |  BoolVal b -> return b
   | _ -> error "Expected a boolean!"
 
-let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result = function
+let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result =
+  function
   | PairVal(v1,v2) -> return (v1,v2)
   | _ -> error "Expected a pair!"
 
-let tupleVal_to_list_of_evs: exp_val -> (exp_val list) ea_result = function
+let tupleVal_to_list_of_evs: exp_val -> (exp_val list) ea_result =
+  function
   | TupleVal(evs) -> return evs
   | _ -> error "Expected a tuple!"
 
-let fields_of_recordVal: exp_val -> ((string*exp_val) list) ea_result = function
+let fields_of_recordVal: exp_val -> ((string*(bool*exp_val)) list
+                                    ) ea_result =
+  function
   | RecordVal(fs) -> return fs
   | _ -> error "Expected a record!"
 
-let list_of_listVal : exp_val -> (exp_val list) ea_result = function
+let list_of_listVal : exp_val -> (exp_val list) ea_result =
+  function
   | ListVal(vs) -> return vs
   | _ -> error "Expected a pair!"
 
-let string_of_stringVal : exp_val -> string ea_result =  function
+let string_of_stringVal : exp_val -> string ea_result =
+  function
   | StringVal s -> return s
   | _ -> error "Expected a string!"
 
-let int_of_refVal =  function
+let int_of_refVal =
+  function
   |  RefVal n -> return n
   | _ -> error "Expected a reference!"
 
 let clos_of_procVal : exp_val -> (string*expr*env) ea_result =
-  fun ev ->
-  match ev with
+  function
   | ProcVal(id,body,en) -> return (id,body,en)
   | _ -> error "Expected a closure!"
            
-let obj_of_objectVal =  function
+let obj_of_objectVal =
+  function
   | ObjectVal(c_name,env) -> return (c_name,env)
   | _ -> error "Expected an object!"
 
-let rec string_of_expval = function
+let rec string_of_expval =
+  function
   |  NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
-  | ProcVal (id,body,env) -> "ProcVal ("^ id ^","^string_of_expr
+  | ProcVal (id,body,env) -> "ProcVal("^ id ^","^string_of_expr
                                body^","^ string_of_env' []
                                              env^")"
   | PairVal(v1,v2) -> "PairVal("^string_of_expval
                         v1^","^string_of_expval v2^")"
-  | TupleVal(evs) ->  "Tuple (" ^ String.concat "," (List.map
+  | TupleVal(evs) ->  "Tuple(" ^ String.concat "," (List.map
                                                    string_of_expval
                                                    evs)  ^ ")"   | UnitVal -> "UnitVal " 
-  | RefVal i -> "RefVal ("^string_of_int i^")"
+  | RefVal i -> "RefVal("^string_of_int i^")"
   | ObjectVal(id,env) -> "ObjectVal("^id ^","^string_of_env' [] env^")"
   | StringVal s -> "StringVal " ^ s
-  | ListVal(evs) ->  "ListVal (" ^String.concat "," (List.map
+  | ListVal(evs) ->  "ListVal(" ^String.concat "," (List.map
                                                    string_of_expval
                                                    evs)  ^ ")" 
-  | _ -> failwith "string_of_expval: not implemented"
+  | RecordVal(fs) -> "RecordVal("^ String.concat "," (List.map (fun (n,(b,ev)) ->
+      n^ (if b then "<=" else "=") ^string_of_expval ev) fs) ^")"
 and
    string_of_env' ac = function
   | EmptyEnv ->  "["^String.concat ",\n" ac^"]"

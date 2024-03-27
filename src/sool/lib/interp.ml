@@ -206,17 +206,17 @@ and
     eval_exprs es >>= fun vs ->
     return (List.hd (List.rev vs))
   (* Record operations *)
-  | Record(fs) ->
-    let (ids,fes) = List.split fs
-    in let (_flags,es) = List.split fes
-    in eval_exprs es >>= fun evs ->
-    return @@ RecordVal (List.combine ids evs)
-  | Proj(e,id) ->
-    eval_expr e >>=
-    fields_of_recordVal >>= fun fs ->
-    (match List.assoc_opt id fs with
-     | None -> error "Proj: field not found"
-     | Some ev -> return ev)
+  (* | Record(fs) -> *)
+  (*   let (ids,fes) = List.split fs *)
+  (*   in let (_flags,es) = List.split fes *)
+  (*   in eval_exprs es >>= fun evs -> *)
+  (*   return @@ RecordVal (List.combine ids evs) *)
+  (* | Proj(e,id) -> *)
+  (*   eval_expr e >>= *)
+  (*   fields_of_recordVal >>= fun fs -> *)
+  (*   (match List.assoc_opt id fs with *)
+  (*    | None -> error "Proj: field not found" *)
+  (*    | Some ev -> return ev) *)
   (* SOOL operations *)
   | NewObject(c_name,es) ->
     eval_exprs es >>= fun args ->
