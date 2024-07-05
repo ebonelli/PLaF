@@ -50,18 +50,6 @@ let rec eval_expr : expr -> exp_val ea_result =
     eval_expr e >>=
     int_of_numVal >>= fun n ->
     return (BoolVal (n = 0))
-  | Pair(e1,e2) ->
-    eval_expr e1 >>= fun ev1 ->
-    eval_expr e2 >>= fun ev2 ->
-    return (PairVal(ev1,ev2))
-  | Fst(e) ->
-    eval_expr e >>=
-    pair_of_pairVal >>= fun (l,_) ->
-    return l
-  | Snd(e) ->
-    eval_expr e >>=
-    pair_of_pairVal >>= fun (_,r) ->
-    return r
   | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
@@ -71,7 +59,6 @@ let rec eval_expr : expr -> exp_val ea_result =
 (** [eval_prog e] evaluates program [e] *)
 let eval_prog (AProg(_,e)) =
   eval_expr e
-
 
 (** [interp s] parses [s] and then evaluates it *)
 let interp (e:string) : exp_val result =
