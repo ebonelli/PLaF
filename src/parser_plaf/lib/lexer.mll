@@ -142,3 +142,4 @@ and
   | '\n'     { Lexing.new_line lexbuf; comment lexbuf }
   | eof  { failwith "unterminated comment" }
   | _    { comment lexbuf }  (* skip comments *)
+

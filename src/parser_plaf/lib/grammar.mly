@@ -106,8 +106,8 @@ open Ast
 %token REFTYPE "ref"
 %token TREETYPE "tree"
 %token LISTTYPE "list"
-%token SETTYPE "sett"
 %token STACKTYPE "stack"
+%token SETTYPE "sett"
 %token QUEUETYPE "queue"
 %token HTBLTYPE "htbl"
 %token EOF
