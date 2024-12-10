@@ -25,9 +25,6 @@ let rec eval_expr : expr -> int result =
     if m=0
     then error "Division by zero"
     else return (n/m)
-  | Abs(e) ->
-    eval_expr e >>= fun n ->
-    return (abs n)
   | _ -> failwith "Not implemented yet!"
 
 (** [eval_prog e] evaluates program [e] *)
