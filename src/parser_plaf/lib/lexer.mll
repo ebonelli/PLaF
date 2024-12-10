@@ -96,6 +96,7 @@ rule read =
   | "instanceof?"  { INSTANCEOF }
   | "interface"  { INTERFACE }
   | "cast"   { CAST }
+  (* types *)
   | "int"    { INTTYPE }
   | "bool"   { BOOLTYPE }
   | "unit"   { UNITTYPE }
@@ -103,7 +104,8 @@ rule read =
   | "list"   { LISTTYPE }
   | "tree"   { TREETYPE }
   | "sett"   { SETTYPE }
-  | "queue"   { QUEUETYPE }
+  | "stack"  { STACKTYPE }
+  | "queue"  { QUEUETYPE }
   | "htbl"   { HTBLTYPE }
   (* stacks *)
   | "emptystack"   { EMPTYSTACK }

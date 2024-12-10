@@ -107,6 +107,7 @@ open Ast
 %token TREETYPE "tree"
 %token LISTTYPE "list"
 %token SETTYPE "sett"
+%token STACKTYPE "stack"
 %token QUEUETYPE "queue"
 %token HTBLTYPE "htbl"
 %token EOF
@@ -291,6 +292,7 @@ texpr:
 | "list"; t1 = texpr { ListType(t1) }
 | "sett"; LPAREN; t1 = texpr; RPAREN; { SetType(t1) }
 | "queue"; LPAREN; t1 = texpr; RPAREN { QueueType(t1) }
+| "stack"; LPAREN; t1 = texpr; RPAREN { StackType(t1) }
 | "htbl";  LPAREN; t1 = texpr; COMMA; t2 = texpr; RPAREN { HtblType(t1,t2) }
 | LBRACE; ts = separated_list(SEMICOLON, fieldtype); RBRACE { RecordType(ts) }
      
