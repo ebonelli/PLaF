@@ -37,6 +37,8 @@ rule read =
   | ")"       { RPAREN }
   | "{"       { LBRACE }
   | "}"       { RBRACE }
+  | "["      { LBRACKET }
+  | "]"      { RBRACKET }
   | "<"       { LANGLE }
   | ">"       { RANGLE }
   | "<<"      { LLANGLE }
@@ -84,6 +86,12 @@ rule read =
   | "->"        { ARROW }  
   | "of"        { OF }
   | "send"    { SEND }
+  | "module"   { MODULE }
+  | "interface" { INTERFACE }
+  | "body" { BODY }
+  | "from" { FROM }
+  | "take" { TAKE }
+  | "open" { OPEN }
   | "class"   { CLASS }
   | "super"   { SUPER }
   | "extends" { EXTENDS }
@@ -94,7 +102,6 @@ rule read =
   | "empty?"   { ISEMPTY }
   | "implements"  { IMPLEMENTS }
   | "instanceof?"  { INSTANCEOF }
-  | "interface"  { INTERFACE }
   | "cast"   { CAST }
   (* types *)
   | "int"    { INTTYPE }

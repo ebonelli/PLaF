@@ -1,7 +1,7 @@
 (* The type of the abstract syntax tree (AST). *)
 
 type 
-  prog = AProg of (cdecl list)*expr
+  prog = AProg of (decl list)*expr
 and
   expr =
   | Var of string
@@ -79,17 +79,29 @@ and
   | InsertHtbl of expr*expr*expr
   | LookupHtbl of expr*expr
   | RemoveHtbl of expr*expr
+  (* modules *)
+  | Open of string*expr
+  | QualVar of string*string
   | Debug of expr
 and (* recursive function declarations *)
   rdecs = (string*string*texpr option*texpr option*expr) list
 and (* class declarations *)
-  cdecl =
+  decl =
   | Class of string*string*string option*(string*texpr option) list*mdecl list
   | Interface of string*abs_mdecl list
+  | AModDecl of string*module_interface*module_body           
 and (* method declarations *)
   mdecl = Method of string*texpr option*(string*texpr option) list*expr
 and (* abstract method declarations *)
   abs_mdecl = MethodAbs of string*texpr*(string*texpr option) list
+and
+  module_interface = ModuleSimpleInterface of module_vdecl list
+and
+  module_body = ModuleBody of module_vdef list
+and
+  module_vdecl = string*texpr
+and
+  module_vdef = string*expr
 and 
   texpr =
   | UserType of string

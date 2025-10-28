@@ -24,6 +24,8 @@ open Ast
 %token RBRACE
 %token LANGLE
 %token RANGLE
+%token LBRACKET
+%token RBRACKET
 %token LLANGLE
 %token RRANGLE
 %token ABS
@@ -63,6 +65,12 @@ open Ast
 %token OF
 %token DEBUG
 %token SEND
+%token MODULE
+%token INTERFACE 
+%token BODY 
+%token FROM 
+%token TAKE 
+%token OPEN 
 %token CLASS
 %token EXTENDS
 %token SUPER
@@ -84,7 +92,6 @@ open Ast
 %token SIZE
 %token IMPLEMENTS
 %token INSTANCEOF
-%token INTERFACE
 %token CAST
 %token MKSET 
 %token EMPTYSET 
@@ -138,7 +145,7 @@ open Ast
    The action says to return value [AProg(cls,e)]. *)
 
 prog:
- | cls = list(iface_or_class_decl); e = expr; EOF { AProg(cls,e) }
+ | cls = list(iface_or_class_or_module_decl); e = expr; EOF { AProg(cls,e) }
 
 (* The remaining rules address expressions and class declarations. *)
 
@@ -232,6 +239,9 @@ expr:
 | INSERTHTBL; LPAREN; e1 = expr; COMMA; e2 = expr; COMMA; e3 = expr; RPAREN { InsertHtbl(e1,e2,e3) }
 | LOOKUPHTBL; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { LookupHtbl(e1,e2) }
 | REMOVEHTBL; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { RemoveHtbl(e1,e2) }
+(* Modules *)
+| FROM; x = ID; TAKE; y = ID { QualVar(x,y) }
+| OPEN; x=ID; IN; e=expr { Open(x,e) }
 
 rdecs:
 | x = ID; LPAREN; y = ID; targ=option(type_annotation); RPAREN;
@@ -248,13 +258,31 @@ field:
 fieldtype:
 | id = ID; COLON; t=texpr { (id,t) }
 
-iface_or_class_decl:
+iface_or_class_or_module_decl:
 | CLASS; id1=ID; EXTENDS; id2=ID; id3=option(implements_declaration);
   LBRACE; ofs = list(obj_fields); mths = list(method_decl); RBRACE
   { Class(id1,id2,id3,ofs,mths)}
 | INTERFACE; id=ID; LBRACE; amths = list(abstract_method_decl); RBRACE
   { Interface(id,amths)}
+| MODULE; x=ID; INTERFACE; i=minterfc; BODY;
+  b=mbody { AModDecl (x,i,b) }
+        ;
 
+minterfc:
+        | LBRACKET; ds=list(mvdecl); RBRACKET { ModuleSimpleInterface (ds) }
+        ;
+mvdecl:
+        |  x=ID; COLON; t=texpr { (x,t) }
+        ;
+     
+mbody:
+        | LBRACKET; ds=list(mvdef); RBRACKET { ModuleBody (ds) }
+        ;
+
+mvdef:
+        | x=ID; EQUALS; e=expr { (x,e) }
+          ;
+            
 implements_declaration:
 | IMPLEMENTS; id=ID { id }
 
