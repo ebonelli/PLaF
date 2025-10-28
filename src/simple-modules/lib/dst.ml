@@ -1,4 +1,4 @@
-open Ast
+open Parser_plaf.Ast
 open ReM
 
 (*  ;;;;;;;;;;;;;;;; type environments ;;;;;;;;;;;;;;;; *)
@@ -41,7 +41,7 @@ let rec append_tenv' (tenv1:tenv) (tenv2:tenv) : tenv  =
   | ExtendTEnvMod(moduleName,tbindings,tenv) ->
   ExtendTEnvMod(moduleName,tbindings,append_tenv' tenv1 tenv)
 
-let rec append_tenv  (tenv2:tenv) : tenv tea_result =
+let append_tenv  (tenv2:tenv) : tenv tea_result =
   fun tenv1->
   Ok (append_tenv' tenv1 tenv2)
 
@@ -122,7 +122,7 @@ let reverse_tenv tenv =
   (ExtendTEnvMod(mid,body,acc)) tenv_tail
   in reverse_tenv' EmptyTEnv tenv
 
-let rec is_subtype (actual:tenv) (expected: vdecl list):bool =
+let rec is_subtype (actual:tenv) (expected: module_vdecl list):bool =
   match actual, expected with
   | _,[] -> true               
   | EmptyTEnv,_::_ -> false

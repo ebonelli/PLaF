@@ -1,3 +1,5 @@
+open Parser_plaf.Ast
+open Parser_plaf.Parser
 open ReM
 
 (* This file defines expressed values and environments *)
@@ -8,7 +10,7 @@ open ReM
 type exp_val =
   | NumVal of int
   | BoolVal of bool
-  | ProcVal of string*Ast.expr*env
+  | ProcVal of string*expr*env
   | PairVal of exp_val*exp_val
   | TupleVal of exp_val list
   | UnitVal
@@ -17,7 +19,7 @@ and
   env =
   | EmptyEnv
   | ExtendEnv of string*exp_val*env
-  | ExtendEnvRec of string*string*Ast.expr*env
+  | ExtendEnvRec of string*string*expr*env
   | ExtendEnvMod of string*env*env
 
 
@@ -46,7 +48,7 @@ let extend_env : string -> exp_val -> env ea_result =
     Ok (ExtendEnv(id,v,env))
 
 
-let extend_env_rec : string -> string -> Ast.expr -> env ea_result =
+let extend_env_rec : string -> string -> expr -> env ea_result =
   fun id par body env  ->
     Ok (ExtendEnvRec(id,par,body,env))
 
@@ -131,7 +133,7 @@ let tupleVal_to_list_of_evs: exp_val -> (exp_val list) ea_result = function
   | TupleVal(evs) -> return evs
   | _ -> error "Expected a tuple!"
 
-let clos_of_procVal : exp_val -> (string*Ast.expr*env) ea_result =
+let clos_of_procVal : exp_val -> (string*expr*env) ea_result =
   fun ev ->
   match ev with
   | ProcVal(id,body,en) -> return (id,body,en)
@@ -150,7 +152,7 @@ let int_of_refVal =  function
 let rec string_of_expval = function
   |  NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
-  | ProcVal (id,body,env) -> "ProcVal ("^id^","^Ast.string_of_expr
+  | ProcVal (id,body,env) -> "ProcVal ("^id^","^string_of_expr
                                body^","^ string_of_env' env^")"
   | PairVal(v1,v2) -> "PairVal("^string_of_expval
                         v1^","^string_of_expval v2^")"
@@ -164,7 +166,7 @@ and
   | EmptyEnv -> ""
   | ExtendEnv(id,v,env) -> "("^id^","^string_of_expval v^")\n"^string_of_env' env
   | ExtendEnvRec(id,param,body,env) ->
-    "("^id^","^param^","^Ast.string_of_expr body^")\n"^string_of_env'
+    "("^id^","^param^","^string_of_expr body^")\n"^string_of_env'
       env
   | ExtendEnvMod(id,defs,env) -> "Module "^id^"["^ (string_of_env'
                                                       defs)^"]\n"^string_of_env' env

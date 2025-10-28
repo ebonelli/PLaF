@@ -1,4 +1,5 @@
-open Ast
+open Parser_plaf.Ast
+open Parser_plaf.Parser
 open ReM
 open Ds
 
@@ -7,7 +8,7 @@ open Ds
 let g_store = Store.empty_store 20 (NumVal 0)
 
 
-let rec apply_clos : string*Ast.expr*env -> exp_val -> exp_val ea_result =
+let rec apply_clos : string*expr*env -> exp_val -> exp_val ea_result =
   fun (id,e,en) ev ->
   return en >>+
   extend_env id ev >>+
@@ -69,7 +70,7 @@ and
     clos_of_procVal >>= fun clos ->
     eval_expr e2 >>= 
     apply_clos clos 
-  | Letrec(_ty,id,par,_tParam,e,target) ->
+  | Letrec([id,par,_tParam,_tRes,e],target) ->
     extend_env_rec id par e >>+
     eval_expr target 
   | BeginEnd([]) ->
@@ -110,7 +111,7 @@ and
    *     (return (en,EmptyEnv))
    *     vdefs) >>= fun (_,renv) ->
    * return renv *)
-  eval_module_definition : module_body -> env ea_result = fun (AModBody vdefs) ->
+  eval_module_definition : module_body -> env ea_result = fun (ModuleBody vdefs) ->
   lookup_env >>= fun glo_env ->
   List.fold_left (fun loc_env (var,decl)  ->
        loc_env >>+
@@ -120,7 +121,7 @@ and
       (empty_env ())
       vdefs
 and
-  eval_module_definitions : module_decl list -> env ea_result = fun ms ->
+  eval_module_definitions : decl list -> env ea_result = fun ms ->
   List.fold_left
     (fun curr_en (AModDecl(mname,_minterface,mbody)) ->
        curr_en >>+
@@ -134,4 +135,8 @@ and
    eval_expr e
 
 
+(** [interp s] parses [s] and then evaluates it *)
+let interp (s:string) : exp_val result =
+  let c = s |> parse |> eval_prog
+  in run c
 
