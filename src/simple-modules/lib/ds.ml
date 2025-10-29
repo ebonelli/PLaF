@@ -1,5 +1,4 @@
 open Parser_plaf.Ast
-open Parser_plaf.Parser
 open ReM
 
 (* This file defines expressed values and environments *)
@@ -22,21 +21,10 @@ and
   | ExtendEnvRec of string*string*expr*env
   | ExtendEnvMod of string*env*env
 
-
 type 'a ea_result = ('a,env) a_result
-
-
 
 let run (c:'a ea_result) : 'a result =
   c EmptyEnv
-
-let sequence (cs: ('a ea_result) list) : ('a list) ea_result  =
-  let mcons p q = p >>= fun x -> q >>= fun y -> return (x::y)
-  in List.fold_right mcons cs (return []) 
-
-let mapM (f:'a -> 'b ea_result) (vs:'a list) : ('b list) ea_result = sequence (List.map f vs)
-
-
 
 (* Operations on environments *)
 let empty_env : unit -> env ea_result =
@@ -153,7 +141,7 @@ let rec string_of_expval = function
   |  NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
   | ProcVal (id,body,env) -> "ProcVal ("^id^","^string_of_expr
-                               body^","^ string_of_env' env^")"
+                               body^","^ string_of_env' "" env^")"
   | PairVal(v1,v2) -> "PairVal("^string_of_expval
                         v1^","^string_of_expval v2^")"
   | TupleVal(evs) ->  "Tuple (" ^ string_of_list_of_strings (List.map
@@ -162,19 +150,22 @@ let rec string_of_expval = function
   | UnitVal -> "UnitVal " 
   | RefVal i -> "RefVal ("^string_of_int i^")"
 and
-  string_of_env'  = function
+  string_of_env' offset = function
   | EmptyEnv -> ""
-  | ExtendEnv(id,v,env) -> "("^id^","^string_of_expval v^")\n"^string_of_env' env
+  | ExtendEnv(id,v,env) -> offset^"("^id^","^string_of_expval
+                             v^")\n"^string_of_env' offset env
   | ExtendEnvRec(id,param,body,env) ->
-    "("^id^","^param^","^string_of_expr body^")\n"^string_of_env'
+    offset^"("^id^","^param^","^string_of_expr body^")\n"^string_of_env' offset
       env
-  | ExtendEnvMod(id,defs,env) -> "Module "^id^"["^ (string_of_env'
-                                                      defs)^"]\n"^string_of_env' env
+  | ExtendEnvMod(id,defs,env) -> offset^"(Module,"^id^",[\n"^ (string_of_env'
+                                                        (offset^" ")
+                                                        defs)^"]\n"
+                                 ^string_of_env' offset env
 
 
 let string_of_env : string ea_result =
   fun env ->
-  Ok ("Environment:\n"^ string_of_env' env)
+  Ok ("Environment:\n"^ string_of_env' "" env)
 
 
 

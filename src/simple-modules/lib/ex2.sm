@@ -1,0 +1,12 @@
+module m1
+  interface
+    [ a : int
+      b : int
+      c : int ]
+body
+    [a = 33
+     x = a-1
+     b = a-x (* =1 *)
+     c = x-b (* =31 *) ]
+let a = 10
+in ((from m1 take a) - (from m1 take b)) - a

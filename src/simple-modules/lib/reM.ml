@@ -23,3 +23,11 @@ let (>>+) (c:('b,'b) a_result) (d:('a,'b) a_result): ('a,'b) a_result =
   match c env with
   | Error err -> Error err
   | Ok newenv -> d newenv
+
+let sequence cs  =
+  let mcons p q = p >>= fun x -> q >>= fun y -> return (x::y)
+  in List.fold_right mcons cs (return []) 
+
+let mapM f vs =
+  sequence (List.map f vs)
+

@@ -8,13 +8,6 @@ type tenv =
   | ExtendTEnv of string*texpr*tenv
   | ExtendTEnvMod of string*tenv*tenv
                      
-let rec string_of_tenv  = function
-  | EmptyTEnv -> ""
-  | ExtendTEnv(id,t,tenv) -> "("^id^","^string_of_texpr t^")"^string_of_tenv tenv
-  | ExtendTEnvMod(id,decls,tenv) -> "( Module "^id^","^string_of_tenv
-                                    decls^")"^string_of_tenv tenv
-
-
 type 'a tea_result = ('a,tenv) a_result
 
 let run_teac (c:'a tea_result) : 'a result =
@@ -28,7 +21,7 @@ let rec lookup_module_type (mid:string) : tenv tea_result =
   fun tenv ->
   match tenv with
   | EmptyTEnv -> Error "module not found"
-  | ExtendTEnv (key,ty,tenv) -> lookup_module_type mid tenv
+  | ExtendTEnv(_key,_ty,tenv) -> lookup_module_type mid tenv
   | ExtendTEnvMod(moduleName,tbindings,tenv) ->
     if mid=moduleName
     then Ok tbindings
@@ -61,7 +54,7 @@ let append_tenv_rev (tenv1:tenv) : tenv tea_result = fun tenv2 ->
 exception Subtype_failure of string
                        
 let empty_tenv () : tenv tea_result =
-  fun tenv ->
+  fun _tenv ->
   Ok EmptyTEnv
 
 let extend_tenv id t : tenv tea_result =
@@ -89,14 +82,14 @@ let rec apply_tenv  (id:string): texpr tea_result =
     if id=key
     then Ok value
     else apply_tenv id tail
-  | ExtendTEnvMod(m_name,m_type,tail) -> apply_tenv id tail
+  | ExtendTEnvMod(_m_name,_m_type,tail) -> apply_tenv id tail
 
 let rec apply_tenv_qual (id_module:string) (id:string)
   : texpr tea_result =
   fun tenv ->
   match tenv with
   | EmptyTEnv -> Error "Key not found"
-  | ExtendTEnv (key,value,tenv1) -> apply_tenv_qual id_module id tenv1
+  | ExtendTEnv(_key,_value,tenv1) -> apply_tenv_qual id_module id tenv1
   | ExtendTEnvMod(m_name,m_type,tail) ->
         if id_module=m_name
     then apply_tenv id m_type 
