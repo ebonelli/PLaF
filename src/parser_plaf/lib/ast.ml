@@ -82,7 +82,18 @@ and
   (* modules *)
   | Open of string*expr
   | QualVar of string*string
+  (* adts *)
+  | Variant of string*(expr list)
+  | Case of expr*(case_branch list)
+  | TypeDecl of string*(constructor_decl list)
   | Debug of expr
+  (* type declaration branch *)
+and
+  case_branch =
+  | CaseBranch of string*string list*expr
+and
+  constructor_decl =
+  | Constructor of string*texpr list 
 and (* recursive function declarations *)
   rdecs = (string*string*texpr option*texpr option*expr) list
 and (* class declarations *)

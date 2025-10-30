@@ -52,18 +52,6 @@ and
     eval_expr e >>=
     int_of_numVal >>= fun n ->
     return (BoolVal (n = 0))
-  | Pair(e1,e2) ->
-    eval_expr e1 >>= fun ev1 ->
-    eval_expr e2 >>= fun ev2 ->
-    return (PairVal(ev1,ev2))
-  | Fst(e) ->
-    eval_expr e >>=
-    pair_of_pairVal >>= fun p ->
-    return (fst p) 
-  | Snd(e) ->
-    eval_expr e >>=
-    pair_of_pairVal >>= fun p ->
-    return (snd p)
   | Proc(id,_,e)  ->
     lookup_env >>= fun en ->
     return (ProcVal(id,e,en))

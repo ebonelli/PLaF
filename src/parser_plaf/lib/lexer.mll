@@ -17,8 +17,10 @@ exception Error of string
 let whitespace_char_no_newline = [' ' '\t' '\012' '\r']+
 let digit = ['0'-'9']
 let int = digit digit*
-let letter = ['a'-'z' 'A'-'Z']
-let id = letter ['a'-'z' 'A'-'Z' '0'-'9' '_' '?']*
+let lowercase_letter = ['a'-'z']
+let id = lowercase_letter ['a'-'z' 'A'-'Z' '0'-'9' '_' '?']*
+let uppercase_letter = ['A'-'Z']
+let constructor = uppercase_letter ['a'-'z' 'A'-'Z']*
 
 (* Entry points:
    read, comment *)
@@ -137,7 +139,12 @@ rule read =
   | "inserthtbl"   { INSERTHTBL }
   | "lookuphtbl"   { LOOKUPHTBL }
   | "removehtbl"   { REMOVEHTBL }
-  | id       { ID (Lexing.lexeme lexbuf) }
+  (* Variant types *)
+  | "|"        { PIPE }
+  | "type"     { TYPE }
+  | "case"     { CASE }
+  | constructor     { CONSTRUCTOR (Lexing.lexeme lexbuf) }
+  | id         { ID (Lexing.lexeme lexbuf) }
   | eof      { EOF }
   | _
       { raise (Error (Printf.sprintf

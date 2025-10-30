@@ -8,8 +8,6 @@ open Parser_plaf.Ast
 type exp_val =
   | NumVal of int
   | BoolVal of bool
-  | UnitVal
-  | PairVal of exp_val*exp_val
   | ProcVal of string*expr*env
 and
   env =
@@ -95,10 +93,6 @@ let bool_of_boolVal : exp_val -> bool ea_result =  function
   |  BoolVal b -> return b
   | _ -> error "Expected a boolean!"
 
-let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result = function
-  | PairVal(v1,v2) -> return (v1,v2)
-  | _ -> error "Expected a pair!"           
-
 let clos_of_procVal : exp_val -> (string*expr*env) ea_result =
   fun ev ->
   match ev with
@@ -108,12 +102,9 @@ let clos_of_procVal : exp_val -> (string*expr*env) ea_result =
 let rec string_of_expval = function
   |  NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
-  | UnitVal -> "UnitVal "
   | ProcVal (id,body,env) -> "ProcVal ("^ id ^","^string_of_expr
                                body^","^ string_of_env' []
                                              env^")"
-  | PairVal(v1,v2) -> "PairVal("^string_of_expval
-                        v1^","^string_of_expval v2^")"
 and
    string_of_env' ac = function
   | EmptyEnv ->  "["^String.concat ",\n" ac^"]"

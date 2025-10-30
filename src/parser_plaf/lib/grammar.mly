@@ -14,6 +14,7 @@ open Ast
 
 %token <int> INT
 %token <string> ID
+%token <string> CONSTRUCTOR
 %token PLUS
 %token MINUS
 %token TIMES
@@ -117,6 +118,9 @@ open Ast
 %token SETTYPE "sett"
 %token QUEUETYPE "queue"
 %token HTBLTYPE "htbl"
+%token PIPE
+%token TYPE
+%token CASE
 %token EOF
 
 (* Precedence and associativity *)
@@ -125,7 +129,7 @@ open Ast
 %right ARROW
 %left PLUS MINUS LLANGLE RRANGLE  
 %left TIMES DIVIDED 
-%left DOT    /* highest precedence */
+%left DOT   /* highest precedence */
 %nonassoc REFTYPE LISTTYPE TREETYPE
                           (*%nonassoc UMINUS        /* highest precedence */*)
 
@@ -242,7 +246,16 @@ expr:
 (* Modules *)
 | FROM; x = ID; TAKE; y = ID { QualVar(x,y) }
 | OPEN; x=ID; IN; e=expr { Open(x,e) }
-
+(* adts *)
+(* | id = CONSTRUCTOR { Variant(id,[]) } *)
+| id = CONSTRUCTOR; LPAREN; es = separated_list(COMMA, expr);
+  RPAREN { Variant(id,es) }
+| CASE; body=expr; OF; LBRACE;
+      bs = nonempty_list(case_branch); RBRACE { Case(body,bs) }
+| TYPE; id=ID; EQUALS; cs = nonempty_list(constructor_decl)
+                                  { TypeDecl(id,cs) }
+  
+    ;
 rdecs:
 | x = ID; LPAREN; y = ID; targ=option(type_annotation); RPAREN;
   tres=option(type_annotation); EQUALS;
@@ -306,7 +319,19 @@ abstract_method_decl:
                   
 formal_par:
 | id=ID; t = option(type_annotation) { (id, t) }
-                  
+
+case_branch:
+    (* | id = CONSTRUCTOR; ARROW; tgt=expr { CaseBranch(id,[],tgt) } *)
+    | id = CONSTRUCTOR; LPAREN; es = separated_list(COMMA, ID);
+      RPAREN; ARROW; tgt=expr { CaseBranch(id,es,tgt) }
+      ;
+        
+constructor_decl:
+    (* | PIPE; id = CONSTRUCTOR { Constructor (id,[]) } *)
+    | PIPE; id = CONSTRUCTOR; LPAREN; es = separated_list(COMMA, texpr);
+      RPAREN  { Constructor (id,es) }
+      ;
+        
 texpr:
 | id=ID { UserType(id) }
 | "int" { IntType } (* tried testing the use of token aliases *)
