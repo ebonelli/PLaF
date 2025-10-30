@@ -89,7 +89,7 @@ and (* class declarations *)
   decl =
   | Class of string*string*string option*(string*texpr option) list*mdecl list
   | Interface of string*abs_mdecl list
-  | AModDecl of string*module_interface*module_body           
+  | Module of string*module_interface*module_body           
 and (* method declarations *)
   mdecl = Method of string*texpr option*(string*texpr option) list*expr
 and (* abstract method declarations *)

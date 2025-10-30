@@ -265,7 +265,7 @@ iface_or_class_or_module_decl:
 | INTERFACE; id=ID; LBRACE; amths = list(abstract_method_decl); RBRACE
   { Interface(id,amths)}
 | MODULE; x=ID; INTERFACE; i=minterfc; BODY;
-  b=mbody { AModDecl (x,i,b) }
+  b=mbody { Module (x,i,b) }
         ;
 
 minterfc:

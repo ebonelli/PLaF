@@ -1,7 +1,5 @@
 open Parser_plaf.Ast
 open ReM
-
-(*  ;;;;;;;;;;;;;;;; type environments ;;;;;;;;;;;;;;;; *)
     
 type tenv =
   | EmptyTEnv
@@ -34,9 +32,9 @@ let rec append_tenv' (tenv1:tenv) (tenv2:tenv) : tenv  =
   | ExtendTEnvMod(moduleName,tbindings,tenv) ->
   ExtendTEnvMod(moduleName,tbindings,append_tenv' tenv1 tenv)
 
-let append_tenv  (tenv2:tenv) : tenv tea_result =
-  fun tenv1->
-  Ok (append_tenv' tenv1 tenv2)
+let extend_tenv_with_tbindings : tenv -> tenv tea_result =
+  fun tbindings tenv ->
+  Ok (append_tenv' tbindings tenv)
 
 let rec append_tenv'(tenv1:tenv) (tenv2:tenv) : tenv = 
   match tenv1 with
@@ -47,7 +45,8 @@ let rec append_tenv'(tenv1:tenv) (tenv2:tenv) : tenv =
     ExtendTEnvMod(moduleName,tbindings,append_tenv' tenv tenv2)
 
 
-let append_tenv_rev (tenv1:tenv) : tenv tea_result = fun tenv2 ->
+let append_tenv_rev : tenv -> tenv tea_result =
+  fun tenv1 tenv2 ->
   Ok (append_tenv' tenv2 tenv1)
 
 
@@ -77,7 +76,7 @@ let args_of_funcType : texpr -> (texpr*texpr) tea_result =  function
 let rec apply_tenv  (id:string): texpr tea_result =
   fun tenv ->
   match tenv with
-  | EmptyTEnv -> Error "Key not found"
+  | EmptyTEnv -> Error ("Unbound value "^id)
   | ExtendTEnv (key,value,tail) ->
     if id=key
     then Ok value
@@ -88,7 +87,7 @@ let rec apply_tenv_qual (id_module:string) (id:string)
   : texpr tea_result =
   fun tenv ->
   match tenv with
-  | EmptyTEnv -> Error "Key not found"
+  | EmptyTEnv -> Error ("Unbound value "^id)
   | ExtendTEnv(_key,_value,tenv1) -> apply_tenv_qual id_module id tenv1
   | ExtendTEnvMod(m_name,m_type,tail) ->
         if id_module=m_name

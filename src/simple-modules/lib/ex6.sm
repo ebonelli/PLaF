@@ -1,0 +1,12 @@
+(* type error: m1.u not in scope *)
+module m2
+  interface
+    [v : int]
+  body
+   [v = (from m1 take u)-11] 
+module m1
+  interface
+    [u : int]
+  body
+   [u = 44]
+from m2 take v

@@ -1,0 +1,9 @@
+(* type error: order of declarations *)
+module m1
+  interface
+    [u : int
+     v : int]
+  body
+    [v = 44
+     u = 33]
+from m1 take u

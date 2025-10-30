@@ -17,12 +17,13 @@ and
    * add_module_type_definitions env ms:tenv =
    * List.fold_left (fun en (AModDecl(mname,minterface,mbody)) ->
    *     ExtendTEnvMod(mname,type_of_module_body en mbody,en) ) env ms *)
-  type_of_modules : decl list -> tenv tea_result = fun mdecls ->          
+  type_of_modules : decl list -> tenv tea_result =
+  fun mdecls ->          
   List.fold_left
     (fun curr_tenv md ->
       match md with
-      | (AModDecl(mname,ModuleSimpleInterface
-                               (expected_iface),mbody)) ->
+      | Module(mname,ModuleSimpleInterface
+                               (expected_iface),mbody) ->
       curr_tenv >>+
       (type_of_module_body mbody >>= fun i_body ->
       if (is_subtype i_body expected_iface)
@@ -36,7 +37,8 @@ and
     mdecls
     
 and
-  type_of_module_body : module_body -> tenv tea_result = fun (ModuleBody vdefs) ->
+  type_of_module_body : module_body -> tenv tea_result =
+  fun (ModuleBody vdefs) ->
   lookup_tenv >>= fun glo_tenv ->
   (List.fold_left (fun loc_tenv (var,decl)  ->
        loc_tenv >>+
@@ -47,7 +49,8 @@ and
       vdefs) >>= fun tmbody ->
   return @@ reverse_tenv tmbody
 and
-  chk_expr : expr -> texpr tea_result = fun e ->
+  chk_expr : expr -> texpr tea_result =
+  fun e ->
   match e with
   | Int _n          ->
     return IntType
@@ -83,7 +86,7 @@ and
   | Proc(id,Some ty,e)      ->
     extend_tenv id ty >>+
     chk_expr e >>= fun tc ->
-    return @@ FuncType(ty,tc)
+    return (FuncType(ty,tc))
   | App(e1,e2)     ->
     chk_expr e1 >>=
     args_of_funcType >>= fun (t1l,t1r) ->
@@ -106,7 +109,7 @@ and
     List.fold_left (fun _ e -> chk_expr e) (return UnitType) es
   | NewRef(e) ->
     chk_expr e >>= fun t ->
-    return @@ RefType(t)
+    return (RefType(t))
   | DeRef(e) ->
     chk_expr e >>= 
     arg_of_refType
@@ -118,8 +121,8 @@ and
     then return UnitType
     else error "SetRef: type of LHS and RHS do not match"
   | Open(module_id,e) ->
-    lookup_module_type module_id >>= fun tenv ->
-    append_tenv tenv >>+
+    lookup_module_type module_id >>= 
+    extend_tenv_with_tbindings >>+
     chk_expr e
   | Debug(_e) ->
     string_of_tenv >>= fun str ->
@@ -127,14 +130,13 @@ and
     return UnitType
   | _ -> failwith "chk_expr: not implemented"
 
-
 (* Type-check an expression *)
 let chk (e:string) : texpr result =
   let c = e |> parse |> chk_prog
   in run_teac c
 
-let chkpp (e:string) : string result =
-  let c = e |> parse |> chk_prog
-  in run_teac (c >>= fun t -> return @@ string_of_texpr t)
-
+(** Type check an expression in a file *)
+let chkf (file_name: string) : texpr result = 
+  let c = file_name |> parsef |> chk_prog
+  in run_teac c
 

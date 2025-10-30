@@ -1,0 +1,8 @@
+(* type error: v not defined *)
+module m1
+  interface
+    [u : int
+     v : int]
+  body
+    [u = 33]
+44
