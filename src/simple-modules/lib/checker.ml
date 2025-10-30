@@ -41,7 +41,7 @@ and
   fun (ModuleBody vdefs) ->
   lookup_tenv >>= fun glo_tenv ->
   (List.fold_left (fun loc_tenv (var,decl)  ->
-       loc_tenv >>+
+       loc_tenv >>+ 
        (append_tenv_rev glo_tenv >>+
         chk_expr decl >>=
         extend_tenv var))
