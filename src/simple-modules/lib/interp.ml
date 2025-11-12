@@ -98,32 +98,32 @@ let rec eval_expr : expr -> exp_val ea_result =
 and
   eval_module_definition : module_body -> env ea_result =
   fun (ModuleBody vdefs) ->
-  lookup_env >>= fun glo_env ->
-  List.fold_left (fun loc_env (var,decl)  ->
-      loc_env >>+
-      (append_env_rev glo_env >>+
-       eval_expr decl >>=
-       extend_env var))
-    (empty_env ())
-    vdefs
+  let rec eval_body_defs glo_env vdefs =
+    (match vdefs with
+     | [] -> lookup_env
+     | (var,decl)::t ->
+       lookup_env >>+
+       (append_env_rev glo_env >>+
+        eval_expr decl >>=
+        extend_env var) >>+
+       eval_body_defs glo_env t)
+  in lookup_env >>= fun glo_env -> (* grab prior module declarations  *)
+  empty_env () >>+                 (* start from empty environment *)
+  eval_body_defs glo_env vdefs     (* add body definitions *)
 and
   eval_module_definitions : decl list -> env ea_result =
   fun ms ->
-  List.fold_left
-    (fun curr_en md ->
-    match md with
-    | Module(mname,_minterface,mbody) ->
-       curr_en >>+
-       (eval_module_definition mbody >>= 
-        extend_env_mod mname)
-    | _ -> error "eval_module_definitions: not a valid module")
-    lookup_env
-    ms
- and
+  (match ms with
+  | [] -> lookup_env
+  | Module(mname,_minterface,mbody)::t ->
+    eval_module_definition mbody >>= 
+    extend_env_mod mname >>+
+    eval_module_definitions t
+  | _ -> error "eval_module_definitions: not a valid module")
+and
    eval_prog (AProg(ms,e)) : exp_val ea_result =
    eval_module_definitions ms >>+
    eval_expr e
-
 
 (** [interp s] parses [s] and then evaluates it *)
 let interp (s:string) : exp_val result =

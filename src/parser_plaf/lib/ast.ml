@@ -96,18 +96,18 @@ and
   | Constructor of string*texpr list 
 and (* recursive function declarations *)
   rdecs = (string*string*texpr option*texpr option*expr) list
-and (* class declarations *)
+and (* class/interface/module declarations *)
   decl =
   | Class of string*string*string option*(string*texpr option) list*mdecl list
   | Interface of string*abs_mdecl list
   | Module of string*module_interface*module_body           
-and (* method declarations *)
+and (* method declaration *)
   mdecl = Method of string*texpr option*(string*texpr option) list*expr
-and (* abstract method declarations *)
+and (* abstract method declaration *)
   abs_mdecl = MethodAbs of string*texpr*(string*texpr option) list
-and
+and  (* module interface declaration *)
   module_interface = ModuleSimpleInterface of module_vdecl list
-and
+and (* module body declaration *)
   module_body = ModuleBody of module_vdef list
 and
   module_vdecl = string*texpr

@@ -12,7 +12,7 @@ module m2
   [a : int
    b : int]
 body
-   [a = 66
+   [a = 55	
     b = 77]
 let z = 99
-in z - (from m1 take a - from m2 take a) 
+in debug(z - (from m1 take a - from m2 take a)) 
