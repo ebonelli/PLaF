@@ -118,14 +118,14 @@ let rec is_subtype (actual:tenv) (expected: module_vdecl list):bool =
   match actual, expected with
   | _,[] -> true               
   | EmptyTEnv,_::_ -> false
-  | ExtendTEnv(ida,tya,tenv),(ide,tye)::ys ->
+  | ExtendTEnv(ida,tya,tenv),(ModuleValueDecl (ide,tye))::ys ->
     if ida=ide
     then tya=tye && is_subtype tenv ys
-    else is_subtype tenv ((ide,tye)::ys)
+    else is_subtype tenv ((ModuleValueDecl (ide,tye))::ys)
   | _,_ -> failwith "Case not reachable"
 
 let var_decls_to_tenv var_decls:tenv =
-  List.fold_left (fun env (var,decl)  ->
+  List.fold_left (fun env ((ModuleValueDecl (var,decl)))  ->
       ExtendTEnv(var, decl,env)) EmptyTEnv var_decls
 
 

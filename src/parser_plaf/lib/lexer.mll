@@ -143,6 +143,9 @@ rule read =
   | "|"        { PIPE }
   | "type"     { TYPE }
   | "case"     { CASE }
+  (* Types declared by modules *)
+  | "opaque"        { OPAQUE }
+  | "transparent"   { TRANSPARENT }
   | constructor     { CONSTRUCTOR (Lexing.lexeme lexbuf) }
   | id         { ID (Lexing.lexeme lexbuf) }
   | eof      { EOF }

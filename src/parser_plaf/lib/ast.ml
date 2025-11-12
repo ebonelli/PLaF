@@ -110,7 +110,10 @@ and  (* module interface declaration *)
 and (* module body declaration *)
   module_body = ModuleBody of module_vdef list
 and
-  module_vdecl = string*texpr
+  module_vdecl =
+  | ModuleValueDecl of string*texpr
+  | ModuleOpaqueTypeDecl of string
+  | ModuleTransparentTypeDecl of string*texpr
 and
   module_vdef = string*expr
 and 

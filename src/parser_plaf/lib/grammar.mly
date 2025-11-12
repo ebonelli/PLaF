@@ -121,6 +121,8 @@ open Ast
 %token PIPE
 %token TYPE
 %token CASE
+%token OPAQUE
+%token TRANSPARENT
 %token EOF
 
 (* Precedence and associativity *)
@@ -247,7 +249,6 @@ expr:
 | FROM; x = ID; TAKE; y = ID { QualVar(x,y) }
 | OPEN; x=ID; IN; e=expr { Open(x,e) }
 (* adts *)
-(* | id = CONSTRUCTOR { Variant(id,[]) } *)
 | id = CONSTRUCTOR; LPAREN; es = separated_list(COMMA, expr);
   RPAREN { Variant(id,es) }
 | CASE; body=expr; OF; LBRACE;
@@ -285,7 +286,9 @@ minterfc:
         | LBRACKET; ds=list(mvdecl); RBRACKET { ModuleSimpleInterface (ds) }
         ;
 mvdecl:
-        |  x=ID; COLON; t=texpr { (x,t) }
+        |  x=ID; COLON; t=texpr { ModuleValueDecl (x,t) }
+        | OPAQUE; id=ID { ModuleOpaqueTypeDecl id }
+        | TRANSPARENT; id=ID; EQUALS; t=texpr { ModuleTransparentTypeDecl (id,t) }
         ;
      
 mbody:
