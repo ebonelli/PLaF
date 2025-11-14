@@ -101,11 +101,14 @@ and
   let rec eval_body_defs glo_env vdefs =
     (match vdefs with
      | [] -> lookup_env
-     | (var,decl)::t ->
+     | (ValueDef (var,decl))::t ->
        lookup_env >>+
        (append_env_rev glo_env >>+
         eval_expr decl >>=
         extend_env var) >>+
+       eval_body_defs glo_env t
+     | (TypeDef (_id,_typ))::t ->
+       lookup_env >>+       
        eval_body_defs glo_env t)
   in lookup_env >>= fun glo_env -> (* grab prior module declarations  *)
   empty_env () >>+                 (* start from empty environment *)

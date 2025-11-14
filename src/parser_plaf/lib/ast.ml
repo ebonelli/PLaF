@@ -115,7 +115,9 @@ and
   | ModuleOpaqueTypeDecl of string
   | ModuleTransparentTypeDecl of string*texpr
 and
-  module_vdef = string*expr
+  module_vdef =
+  | ValueDef of string*expr
+  | TypeDef of string*texpr
 and 
   texpr =
   | UserType of string
@@ -132,6 +134,7 @@ and
   | HtblType of texpr*texpr          
   | RecordType of (string*texpr) list
   | PairType of texpr*texpr
+  | QualType of string*string
 
 
 let rec string_of_expr e =
@@ -236,4 +239,6 @@ and
   | StackType(t) -> "Stack("^string_of_texpr t^")"
   | SetType(t) -> "Set("^string_of_texpr t^")"
   | QueueType(t) -> "Queue("^string_of_texpr t^")"
-  | HtblType(t1,t2) ->  "Htbl("^string_of_texpr t1^","^string_of_texpr t2^")"
+  | HtblType(t1,t2) ->  "Htbl("^string_of_texpr t1^","^string_of_texpr
+                          t2^")"
+  | QualType(id1,id2) -> id1^"."^id2

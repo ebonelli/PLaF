@@ -296,7 +296,8 @@ mbody:
         ;
 
 mvdef:
-        | x=ID; EQUALS; e=expr { (x,e) }
+        | x=ID; EQUALS; e=expr { ValueDef (x,e) }
+        | TYPE; id=ID; EQUALS; t=texpr { TypeDef(id,t) } 
           ;
             
 implements_declaration:
@@ -350,7 +351,10 @@ texpr:
 | "queue"; LPAREN; t1 = texpr; RPAREN { QueueType(t1) }
 | "stack"; LPAREN; t1 = texpr; RPAREN { StackType(t1) }
 | "htbl";  LPAREN; t1 = texpr; COMMA; t2 = texpr; RPAREN { HtblType(t1,t2) }
-| LBRACE; ts = separated_list(SEMICOLON, fieldtype); RBRACE { RecordType(ts) }
+| LBRACE; ts = separated_list(SEMICOLON, fieldtype);
+  RBRACE { RecordType(ts) }
+| FROM; id = ID; TAKE; tid = ID { QualType(id,tid) }
+
      
 
     

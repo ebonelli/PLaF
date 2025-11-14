@@ -40,7 +40,7 @@ and
   type_of_module_body : module_body -> tenv tea_result =
   fun (ModuleBody vdefs) ->
   lookup_tenv >>= fun glo_tenv ->
-  (List.fold_left (fun loc_tenv (var,decl)  ->
+  (List.fold_left (fun loc_tenv (ValueDef (var,decl))  ->
        loc_tenv >>+ 
        (append_tenv_rev glo_tenv >>+
         chk_expr decl >>=
