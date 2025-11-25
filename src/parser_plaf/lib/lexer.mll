@@ -31,6 +31,7 @@ rule read =
   | '\n'      { Lexing.new_line lexbuf; read lexbuf }
   | "(*"      { comment lexbuf; read lexbuf } (* activate "comment" rule *)                 
   | int       { INT (int_of_string (Lexing.lexeme lexbuf)) }
+  | "'"       { SINGLE_RIGHT_QUOTATION_MARK }
   | "+"       { PLUS }
   | "-"       { MINUS }
   | "*"       { TIMES }

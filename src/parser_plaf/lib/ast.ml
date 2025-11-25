@@ -121,6 +121,7 @@ and
 and 
   texpr =
   | UserType of string
+  | TypeVar of string
   | IntType
   | BoolType
   | UnitType
@@ -226,6 +227,7 @@ and
 and
   string_of_texpr = function
   | UserType id -> id
+  | TypeVar id -> "'"^id
   | IntType -> "int"
   | BoolType -> "bool"
   | UnitType -> "unit"

@@ -15,6 +15,7 @@ open Ast
 %token <int> INT
 %token <string> ID
 %token <string> CONSTRUCTOR
+%token SINGLE_RIGHT_QUOTATION_MARK
 %token PLUS
 %token MINUS
 %token TIMES
@@ -338,6 +339,7 @@ constructor_decl:
         
 texpr:
 | id=ID { UserType(id) }
+| SINGLE_RIGHT_QUOTATION_MARK; id=ID { TypeVar(id) }  
 | "int" { IntType } (* tried testing the use of token aliases *)
 | "bool" { BoolType }
 | "unit" { UnitType }
