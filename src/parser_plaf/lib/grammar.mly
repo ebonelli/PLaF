@@ -130,11 +130,12 @@ open Ast
 
 %nonassoc IN ELSE EQUALS EQUALSMUTABLE  /* lowest precedence */
 %right ARROW
+%right LISTTYPE SETTYPE STACKTYPE QUEUETYPE TREETYPE REFTYPE
 %left PLUS MINUS LLANGLE RRANGLE  
 %left TIMES DIVIDED 
 %left DOT   /* highest precedence */
-%nonassoc REFTYPE LISTTYPE TREETYPE
-                          (*%nonassoc UMINUS        /* highest precedence */*)
+(* %nonassoc REFTYPE LISTTYPE TREETYPE *)
+(*%nonassoc UMINUS        /* highest precedence */*)
 
 
 (* Start symbol of the grammar *)
@@ -349,9 +350,9 @@ texpr:
 | "ref"; t1 = texpr { RefType(t1) }
 | "tree"; t1 = texpr { TreeType(t1) }
 | "list"; t1 = texpr { ListType(t1) }
-| "sett"; LPAREN; t1 = texpr; RPAREN; { SetType(t1) }
-| "queue"; LPAREN; t1 = texpr; RPAREN { QueueType(t1) }
-| "stack"; LPAREN; t1 = texpr; RPAREN { StackType(t1) }
+| "sett"; t1 = texpr;  { SetType(t1) }
+| "queue"; t1 = texpr;  { QueueType(t1) }
+| "stack"; t1 = texpr; { StackType(t1) }
 | "htbl";  LPAREN; t1 = texpr; COMMA; t2 = texpr; RPAREN { HtblType(t1,t2) }
 | LBRACE; ts = separated_list(SEMICOLON, fieldtype);
   RBRACE { RecordType(ts) }
