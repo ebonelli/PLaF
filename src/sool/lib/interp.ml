@@ -32,7 +32,7 @@ let initialize_class_env cs =
       | [] -> []
       | Class (name,super,_impl,fields,_methods)::_ when name=c_name ->
         List.map fst fields :: get_fields cs super cs
-      | Class (_,_,_,_,_)::cs'  | Interface(_,_)::cs' ->
+      | Class (_,_,_,_,_)::cs'  | Interface(_,_)::cs' | Module(_,_,_)::cs' ->
         get_fields cs c_name cs'
   in  
   (* Return all visible methods from class c_name 
@@ -44,7 +44,7 @@ let initialize_class_env cs =
       (List.map (fun (Method(n,_ret_type,pars,body))
                   -> (n,(List.map fst pars,body,super,List.flatten fss)))
          methods) @ get_methods cs super (List.tl fss) cs
-    | Class (_,_,_,_,_)::cs'  | Interface(_,_)::cs'
+    | Class (_,_,_,_,_)::cs'  | Interface(_,_)::cs' | Module(_,_,_)::cs'
       -> get_methods cs c_name fss cs'
   in
   (* Build class environment *)
@@ -59,7 +59,9 @@ let initialize_class_env cs =
         g_class_env := (name,(super,List.flatten fss,ms))::!g_class_env;
         initialize_class_env' cs cs'
       | Interface(_,_)::cs' ->
-        initialize_class_env' cs cs'              
+        initialize_class_env' cs cs'
+      | Module(_,_,_)::cs' ->
+        initialize_class_env' cs cs' 
   in g_class_env := [("object",("",[],[]))];
   initialize_class_env' cs cs
 
