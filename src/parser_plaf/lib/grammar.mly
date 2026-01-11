@@ -129,7 +129,7 @@ open Ast
 (* Precedence and associativity *)
 
 %nonassoc IN ELSE EQUALS EQUALSMUTABLE  /* lowest precedence */
-%right ARROW
+%right ARROW SET
 %right LISTTYPE SETTYPE STACKTYPE QUEUETYPE TREETYPE REFTYPE
 %left PLUS MINUS LLANGLE RRANGLE  
 %left TIMES DIVIDED 
@@ -188,7 +188,7 @@ expr:
 | DEREF; LPAREN; e = expr; RPAREN { DeRef(e) }
 | SETREF; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { SetRef(e1,e2) }
 | IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { ITE(e1,e2,e3) }
-| SET; x = ID; EQUALS; e = expr { Set(x,e) }
+| x = ID; SET; e = expr { Set(x,e) }
 | BEGIN; es = separated_list(SEMICOLON, expr); END { BeginEnd(es) }
 | LPAREN; e = expr; RPAREN {e}
   (*    | MINUS e = expr %prec UMINUS { SubExp(IntExp 0,e) }*)

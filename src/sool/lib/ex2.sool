@@ -2,14 +2,14 @@
 
 class counter extends object {
   field c
-  method initialize() { set c=7 }
-  method add(i) { set c=c+i }
+  method initialize() { c:=7 }
+  method add(i) { c:=c+i }
   method bump() { send self add(1) }
   method read() { c }
 }
 
 class resetc extends counter {
-  method reset() { set c=0}
+  method reset() { c:=0}
 }
 
 class bkpc extends resetc {
@@ -17,15 +17,15 @@ class bkpc extends resetc {
   method initialize() {
   begin
     super initialize();
-    set b=12
+    b:=12
     end }
   method add(i) {
       begin
 	send self backup();
 	super add(i)
       end }
-  method backup() { set b=c }
-  method restore() { set c=b}
+  method backup() { b:=c }
+  method restore() { c:=b}
  }
 
 let o = new bkpc()

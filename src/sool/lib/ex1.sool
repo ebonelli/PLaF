@@ -5,8 +5,8 @@ class c1 extends object {
  field y
  method initialize () {
   begin
-   set x = 11;
-   set y = 12
+   x := 11;
+   y := 12
 end }
 method m1 () { x +y }
 method m2 () {  send self m3() }
@@ -17,7 +17,7 @@ class c2 extends c1 {
  method initialize () {
   begin
    super initialize();
-   set y = 22
+     y := 22
 end }
 method m1 (u,v) {  x + y -v }  
 method m3 () { 7}
@@ -29,8 +29,8 @@ class c3 extends c2 {
  method initialize () {
   begin
    super initialize();
-   set x = 31;
-   set z = 32	
+     x := 31;
+     z := 32	
 end
 }
 method m3 () {  x + y + z}
