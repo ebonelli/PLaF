@@ -28,7 +28,8 @@ let error : string -> 'a ea_result = fun s ->
   fun _env -> 
   Error s
 
-let (>>=) : 'a ea_result -> ('a -> 'b ea_result) -> 'b ea_result = fun c f ->
+let (>>=) : 'a ea_result -> ('a -> 'b ea_result) -> 'b ea_result =
+  fun c f ->
   fun env ->
   match c env with
   | Error err -> Error err

@@ -6,25 +6,25 @@ open Parser_plaf.Parser
 let rec eval_expr : expr -> int result =
   fun e ->
   match e with
-  | Int n      -> return n
+  | Int n      -> returnE n
   | Add(e1,e2) ->
-    eval_expr e1 >>= fun n ->
-    eval_expr e2 >>= fun m ->
-    return (n+m)   
+    eval_expr e1 >= fun n ->
+    eval_expr e2 >= fun m ->
+    returnE (n+m)   
   | Sub(e1,e2) ->
-    eval_expr e1 >>= fun n ->
-    eval_expr e2 >>= fun m ->
-    return (n-m)   
+    eval_expr e1 >= fun n ->
+    eval_expr e2 >= fun m ->
+    returnE (n-m)   
   | Mul(e1,e2) ->
-    eval_expr e1 >>= fun n ->
-    eval_expr e2 >>= fun m ->
-    return (n*m)   
+    eval_expr e1 >= fun n ->
+    eval_expr e2 >= fun m ->
+    returnE (n*m)   
   | Div(e1,e2) ->
-    eval_expr e1 >>= fun n ->
-    eval_expr e2 >>= fun m ->
+    eval_expr e1 >= fun n ->
+    eval_expr e2 >= fun m ->
     if m=0
-    then error "Division by zero"
-    else return (n/m)
+    then errorE "Division by zero"
+    else returnE (n/m)
   | _ -> failwith "Not implemented yet!"
 
 (** [eval_prog e] evaluates program [e] *)
