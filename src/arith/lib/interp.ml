@@ -8,20 +8,20 @@ let rec eval_expr : expr -> int result =
   match e with
   | Int n      -> returnE n
   | Add(e1,e2) ->
-    eval_expr e1 >= fun n ->
-    eval_expr e2 >= fun m ->
+    eval_expr e1 >>>= fun n ->
+    eval_expr e2 >>>= fun m ->
     returnE (n+m)   
   | Sub(e1,e2) ->
-    eval_expr e1 >= fun n ->
-    eval_expr e2 >= fun m ->
+    eval_expr e1 >>>= fun n ->
+    eval_expr e2 >>>= fun m ->
     returnE (n-m)   
   | Mul(e1,e2) ->
-    eval_expr e1 >= fun n ->
-    eval_expr e2 >= fun m ->
+    eval_expr e1 >>>= fun n ->
+    eval_expr e2 >>>= fun m ->
     returnE (n*m)   
   | Div(e1,e2) ->
-    eval_expr e1 >= fun n ->
-    eval_expr e2 >= fun m ->
+    eval_expr e1 >>>= fun n ->
+    eval_expr e2 >>>= fun m ->
     if m=0
     then errorE "Division by zero"
     else returnE (n/m)
