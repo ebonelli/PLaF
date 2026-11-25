@@ -21,6 +21,7 @@ let lowercase_letter = ['a'-'z']
 let id = lowercase_letter ['a'-'z' 'A'-'Z' '0'-'9' '_' '?']*
 let uppercase_letter = ['A'-'Z']
 let constructor = uppercase_letter ['a'-'z' 'A'-'Z']*
+let user_type_id = uppercase_letter ['a'-'z' 'A'-'Z' '0'-'9' '_' '?']*
 
 (* Entry points:
    read, comment *)
@@ -149,6 +150,7 @@ rule read =
   | "transparent"   { TRANSPARENT }
   | constructor     { CONSTRUCTOR (Lexing.lexeme lexbuf) }
   | id         { ID (Lexing.lexeme lexbuf) }
+  | user_type_id         { USER_TYPE_ID (Lexing.lexeme lexbuf) }
   | eof      { EOF }
   | _
       { raise (Error (Printf.sprintf

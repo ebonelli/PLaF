@@ -8,16 +8,17 @@ type method_decl = string list*expr*string*string list
 
 type method_env = (string*method_decl) list
 
-type class_decl = string*string list*method_env
+type decl = 
+  | ClassD of string*string list*method_env 
+  | IfaceD of method_env
 
-type class_env = ((string*class_decl) list)
+type decl_env = (string*decl) list
 
 (* Global holding the store *)
 let g_store = Store.empty_store 20 (NumVal 0)
 
 (* Global holding class declarations *)
-let g_class_env : class_env ref = ref [("object",("",[],[]))]
-
+let g_class_and_iface_env : decl_env ref = ref [("object",ClassD ("",[],[]))]
 
 (* Predicate to determine if a class name is defined *)
 let rec class_defined c_name cs =
@@ -34,7 +35,7 @@ let rec class_defined c_name cs =
  
 (* Initialize contents of g_class_env variable  *)
 
-let initialize_class_env cs =      
+let initialize_class_and_iface_env cs =      
   (* Return all visible fields from class c_name *)
   let rec get_fields =
     fun c_name class_decls ->
@@ -72,10 +73,12 @@ let initialize_class_env cs =
                                 -> (n,(List.map fst pars,body,super,List.flatten fss)))
                        methods) @ super_ms
         in
-        g_class_env := (name,(super,List.flatten fss,ms))::!g_class_env;
+        g_class_and_iface_env := (name,ClassD (super,List.flatten fss,ms))::!g_class_and_iface_env;
         initialize_class_env' cs'
-      | Interface(_,_)::cs' -> (* ignore interfaces *)
-        initialize_class_env' cs'
+      | Interface(name,abs_methods)::cs' -> (* ignore interfaces *)
+        let am_decls = List.map (fun (MethodAbs(mname,_oty, idots)) -> (mname,(List.map fst idots,Int 0,"",[]))) abs_methods
+        in g_class_and_iface_env := (name,IfaceD am_decls)::!g_class_and_iface_env; 
+        initialize_class_env' cs'  
       | Module(_,_,_)::cs' ->
         initialize_class_env' cs' 
   in initialize_class_env' cs
@@ -106,11 +109,12 @@ let new_env : string list -> env ea_result  =
       new_env' ids
   in return EmptyEnv >>+ new_env' fs    
 
-let lookup_method : string -> string -> class_env -> method_decl option =
+let lookup_method : string -> string -> decl_env -> method_decl option =
   fun c_name m_name c_env ->
   match List.assoc_opt c_name c_env with
   | None -> None
-  | Some (_super,_fs,ms) -> List.assoc_opt m_name ms
+  | Some (ClassD (_super,_fs,ms)) -> List.assoc_opt m_name ms
+  | Some (IfaceD _) -> assert false
 
 let rec apply_method : string -> exp_val -> exp_val list ->
   method_decl -> exp_val ea_result =
@@ -224,9 +228,10 @@ and
     return (List.hd (List.rev vs))
   (* SOOL operations *)
   | NewObject(c_name,es) ->
-    (match List.assoc_opt c_name !g_class_env with
+    (match List.assoc_opt c_name !g_class_and_iface_env with
      | None -> error ("NewObject: lookup_class: class "^c_name^" not found")
-     | Some (_super,fields,methods) -> 
+     | Some (IfaceD _) -> error ("NewObject: cannot instantiate interfaces")  
+     | Some (ClassD (_super,fields,methods)) -> 
        eval_exprs es >>= fun args ->
        new_env fields >>= fun env ->
        let self = ObjectVal(c_name,env)
@@ -238,7 +243,7 @@ and
     eval_expr e >>= fun self ->
     obj_of_objectVal self >>= fun (c_name,_) ->
     eval_exprs es >>= fun args ->
-    (match lookup_method c_name m_name !g_class_env with
+    (match lookup_method c_name m_name !g_class_and_iface_env with
      | None -> error "Method not found"
      | Some m -> apply_method m_name self args m)
   | Self ->
@@ -248,7 +253,7 @@ and
     eval_expr (Var "_super") >>=
     string_of_stringVal >>= fun c_name ->
     eval_expr (Var "_self") >>= fun self ->
-    (match lookup_method c_name m_name !g_class_env with
+    (match lookup_method c_name m_name !g_class_and_iface_env with
      | None -> error "Method not found"
      | Some m -> apply_method m_name self args m)
   (* List operations* *)
@@ -291,7 +296,7 @@ and
 and
   eval_prog : prog -> exp_val result =
   fun (AProg(cs, e)) ->
-  initialize_class_env cs >>? fun _ ->  (* Step 1 *) 
+  initialize_class_and_iface_env cs >>? fun _ ->  (* Step 1 *) 
   eval_expr e EmptyEnv                  (* Step 2 *)
 
 (** [interp s] evaluates program [s] *)

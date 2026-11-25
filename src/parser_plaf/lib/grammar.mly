@@ -14,6 +14,7 @@ open Ast
 
 %token <int> INT
 %token <string> ID
+%token <string> USER_TYPE_ID
 %token <string> CONSTRUCTOR
 %token SINGLE_RIGHT_QUOTATION_MARK
 %token PLUS
@@ -320,8 +321,8 @@ method_decl:
        { Method(id,Some retType,params,e) }
                 
 abstract_method_decl:
-| METHOD; retType=texpr; id=ID; LPAREN; params = separated_list(COMMA, formal_par); RPAREN
-         { MethodAbs(id,retType,params) }
+| METHOD; ot = option(texpr); id=ID; LPAREN; params = separated_list(COMMA, formal_par); RPAREN
+         { MethodAbs(id,ot,params) }
                   
 formal_par:
 | id=ID; t = option(type_annotation) { (id, t) }
@@ -339,7 +340,7 @@ constructor_decl:
       ;
         
 texpr:
-| id=ID { UserType(id) }
+| id=USER_TYPE_ID { UserType(id) }
 | SINGLE_RIGHT_QUOTATION_MARK; id=ID { TypeVar(id) }  
 | "int" { IntType } (* tried testing the use of token aliases *)
 | "bool" { BoolType }
