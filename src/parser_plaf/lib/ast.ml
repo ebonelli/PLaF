@@ -104,7 +104,7 @@ and (* class/interface/module declarations *)
 and (* method declaration *)
   mdecl = Method of string*texpr option*(string*texpr option) list*expr
 and (* abstract method declaration *)
-  abs_mdecl = MethodAbs of string*texpr option*(string*texpr option) list
+  abs_mdecl = MethodAbs of string*texpr*(string*texpr option) list
 and  (* module interface declaration *)
   module_interface = ModuleSimpleInterface of module_vdecl list
 and (* module body declaration *)
