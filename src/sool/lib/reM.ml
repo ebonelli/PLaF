@@ -1,6 +1,7 @@
-(* Expressed Result *)
                  
 type 'a result = Ok of 'a | Error of string
+
+(* Reader+Error Monad *)
 
 type ('a,'b) a_result = 'b -> 'a result
   
@@ -31,3 +32,19 @@ let sequence (cs: (('a,'b) a_result) list) : ('a list,'b) a_result  =
 let mapM (f:'a -> ('b,'e) a_result) (vs:'a list)
   : ('b list,'e) a_result =
   sequence (List.map f vs)
+
+(* Error monad *)
+
+let returnE : 'a -> 'a result =
+  fun v ->
+  Ok v
+
+let errorE : string -> 'a result =
+  fun s ->
+  Error s
+
+let (>>?) : 'a result -> ('a -> 'b result) -> 'b result =
+  fun c f ->
+  match c with
+  | Error err -> Error err
+  | Ok v -> f v

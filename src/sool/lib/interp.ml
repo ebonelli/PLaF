@@ -20,50 +20,57 @@ let g_class_env : class_env ref = ref []
 
 
 (* Predicate to determine if a class name is defined *)
-let class_defined c_name =  function
-      | [] -> false
-      | Class (name,_super,_impl,_fields,_methods)::cs'  ->
-        c_name=name || class_defined c_name cs'
-      | Interface(_,_)::cs' -> 
-        class_defined c_name cs'
-      | Module(_,_,_)::cs' ->
-        class_defined c_name cs'
+let rec class_defined c_name cs =
+  match c_name,cs with
+  | "object",_ -> true
+  | _,[] -> false
+  | _,Class (name,_super,_impl,_fields,_methods)::cs'  ->
+    c_name=name || class_defined c_name cs'
+  | _,Interface(_,_)::cs' -> 
+    class_defined c_name cs'
+  | _, Module(_,_,_)::cs' ->
+    class_defined c_name cs'
   
+ 
 (* Initialize contents of g_class_env variable  *)
 
 let initialize_class_env cs =      
- (* Return all visible fields from class c_name 
-  * Note: Should produce an error if the super class does not exist,
- this is pending  *)
+  (* Return all visible fields from class c_name *)
   let rec get_fields =
     fun c_name class_decls ->
       match class_decls with
-      | [] -> []
+      | [] -> returnE []
       | Class (name,super,_impl,fields,_methods)::_ when name=c_name ->
-        List.map fst fields :: get_fields super cs
+        if class_defined super cs
+        then get_fields super cs >>? fun fs ->
+          returnE (List.map fst fields :: fs)
+        else errorE ("get_fields: class "^super^" not defined") 
       | Class (_,_,_,_,_)::cs'  | Interface(_,_)::cs' | Module(_,_,_)::cs' ->
         get_fields c_name cs'
   in  
-  (* Return all visible methods from class c_name 
-   * Note: Should produce an error if the super class does not exist,
-     this is pending   *)
+  (* Return all visible methods from class c_name *)
   let rec get_methods c_name fss = function
-    | [] -> []
+    | [] -> returnE []
     | Class (name,super,_impl,_fields,methods)::_  when name=c_name ->
-      (List.map (fun (Method(n,_ret_type,pars,body))
+       if class_defined super cs
+       then get_methods super (List.tl fss) cs >>? fun ms ->
+      returnE @@ (List.map (fun (Method(n,_ret_type,pars,body))
                   -> (n,(List.map fst pars,body,super,List.flatten fss)))
-         methods) @ get_methods super (List.tl fss) cs
+                    methods) @ ms
+       else errorE ("get_methods: class "^super^" not defined") 
     | Class (_,_,_,_,_)::cs'  | Interface(_,_)::cs' | Module(_,_,_)::cs'
       -> get_methods c_name fss cs'
   in
   (* Build class environment *)
   let rec initialize_class_env' = function
-      | [] -> ()
+      | [] -> returnE ()
       | Class (name,super,_impl,fields,methods)::cs'  ->
-        let fss = (List.map fst fields) :: get_fields super cs
-        in let ms = (List.map (fun (Method(n,_ret_type,pars,body))
+        get_fields super cs >>? fun super_fs ->
+        let fss = (List.map fst fields) :: super_fs
+        in get_methods super (List.tl fss) cs >>? fun super_ms ->        
+        let ms = (List.map (fun (Method(n,_ret_type,pars,body))
                                 -> (n,(List.map fst pars,body,super,List.flatten fss)))
-                       methods) @ get_methods super (List.tl fss) cs
+                       methods) @ super_ms
         in
         g_class_env := (name,(super,List.flatten fss,ms))::!g_class_env;
         initialize_class_env' cs'
@@ -283,18 +290,15 @@ and
     eval_exprs t >>= fun evs ->
     return (ev::evs)
 and
-  eval_prog : prog -> exp_val ea_result =
+  eval_prog : prog -> exp_val result =
   fun (AProg(cs, e)) ->
-  initialize_class_env cs;   (* Step 1 *) 
-  eval_expr e                (* Step 2 *)
-
+  initialize_class_env cs >>? fun _ ->  (* Step 1 *) 
+  eval_expr e EmptyEnv                  (* Step 2 *)
 
 (** [interp s] evaluates program [s] *)
 let interp (s: string) : exp_val result = 
-  let c = s |> parse |> eval_prog in
-  c EmptyEnv
+  s |> parse |> eval_prog 
 
 (** [interpf file_name] evaluates program in file [file_name] *)
 let interpf (file_name: string) : exp_val result = 
-  let c = file_name |> parsef |> eval_prog in
-  run c
+  file_name |> parsef |> eval_prog
