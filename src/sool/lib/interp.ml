@@ -16,7 +16,7 @@ type class_env = ((string*class_decl) list)
 let g_store = Store.empty_store 20 (NumVal 0)
 
 (* Global holding class declarations *)
-let g_class_env : class_env ref = ref []
+let g_class_env : class_env ref = ref [("object",("",[],[]))]
 
 
 (* Predicate to determine if a class name is defined *)
@@ -78,8 +78,7 @@ let initialize_class_env cs =
         initialize_class_env' cs'
       | Module(_,_,_)::cs' ->
         initialize_class_env' cs' 
-  in g_class_env := [("object",("",[],[]))];  (* dummy top-level object class *)
-  initialize_class_env' cs
+  in initialize_class_env' cs
 
 let slice fs env =
   (* return env >>+ string_of_env >>= fun senv -> *)
