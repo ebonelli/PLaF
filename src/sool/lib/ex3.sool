@@ -19,12 +19,12 @@ class resetc extends counterc {
 (* backup counter *)
 class bkpcc extends resetc {
   field b
-(*  method initialize() {
+  method initialize() {
     begin
       super initialize();
       b:=12
     end
-  } *) 
+  } 
   method add(i) {
     begin
       send self backup();

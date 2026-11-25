@@ -19,7 +19,16 @@ let g_store = Store.empty_store 20 (NumVal 0)
 let g_class_env : class_env ref = ref []
 
 
-
+(* Predicate to determine if a class name is defined *)
+let class_defined c_name =  function
+      | [] -> false
+      | Class (name,_super,_impl,_fields,_methods)::cs'  ->
+        c_name=name || class_defined c_name cs'
+      | Interface(_,_)::cs' -> 
+        class_defined c_name cs'
+      | Module(_,_,_)::cs' ->
+        class_defined c_name cs'
+  
 (* Initialize contents of g_class_env variable  *)
 
 let initialize_class_env cs =      
@@ -27,43 +36,43 @@ let initialize_class_env cs =
   * Note: Should produce an error if the super class does not exist,
  this is pending  *)
   let rec get_fields =
-    fun cs c_name class_decls ->
+    fun c_name class_decls ->
       match class_decls with
       | [] -> []
       | Class (name,super,_impl,fields,_methods)::_ when name=c_name ->
-        List.map fst fields :: get_fields cs super cs
+        List.map fst fields :: get_fields super cs
       | Class (_,_,_,_,_)::cs'  | Interface(_,_)::cs' | Module(_,_,_)::cs' ->
-        get_fields cs c_name cs'
+        get_fields c_name cs'
   in  
   (* Return all visible methods from class c_name 
    * Note: Should produce an error if the super class does not exist,
      this is pending   *)
-  let rec get_methods cs c_name fss = function
+  let rec get_methods c_name fss = function
     | [] -> []
     | Class (name,super,_impl,_fields,methods)::_  when name=c_name ->
       (List.map (fun (Method(n,_ret_type,pars,body))
                   -> (n,(List.map fst pars,body,super,List.flatten fss)))
-         methods) @ get_methods cs super (List.tl fss) cs
+         methods) @ get_methods super (List.tl fss) cs
     | Class (_,_,_,_,_)::cs'  | Interface(_,_)::cs' | Module(_,_,_)::cs'
-      -> get_methods cs c_name fss cs'
+      -> get_methods c_name fss cs'
   in
   (* Build class environment *)
-  let rec initialize_class_env' cs = function
+  let rec initialize_class_env' = function
       | [] -> ()
       | Class (name,super,_impl,fields,methods)::cs'  ->
-        let fss = (List.map fst fields) :: get_fields cs super cs
+        let fss = (List.map fst fields) :: get_fields super cs
         in let ms = (List.map (fun (Method(n,_ret_type,pars,body))
                                 -> (n,(List.map fst pars,body,super,List.flatten fss)))
-                       methods) @ get_methods cs super (List.tl fss) cs
+                       methods) @ get_methods super (List.tl fss) cs
         in
         g_class_env := (name,(super,List.flatten fss,ms))::!g_class_env;
-        initialize_class_env' cs cs'
-      | Interface(_,_)::cs' ->
-        initialize_class_env' cs cs'
+        initialize_class_env' cs'
+      | Interface(_,_)::cs' -> (* ignore interfaces *)
+        initialize_class_env' cs'
       | Module(_,_,_)::cs' ->
-        initialize_class_env' cs cs' 
-  in g_class_env := [("object",("",[],[]))];
-  initialize_class_env' cs cs
+        initialize_class_env' cs' 
+  in g_class_env := [("object",("",[],[]))];  (* dummy top-level object class *)
+  initialize_class_env' cs
 
 let slice fs env =
   (* return env >>+ string_of_env >>= fun senv -> *)
@@ -209,10 +218,10 @@ and
     return (List.hd (List.rev vs))
   (* SOOL operations *)
   | NewObject(c_name,es) ->
-    eval_exprs es >>= fun args ->
     (match List.assoc_opt c_name !g_class_env with
      | None -> error ("NewObject: lookup_class: class "^c_name^" not found")
      | Some (_super,fields,methods) -> 
+       eval_exprs es >>= fun args ->
        new_env fields >>= fun env ->
        let self = ObjectVal(c_name,env)
        in (match List.assoc_opt "initialize" methods with
